@@ -10,7 +10,10 @@ export default {
   theme: {
   	extend: {
   		colors: {
+			customBlue: '#1E3A8A',  // Example custom blue
+        customPink: '#F472B6',  // Example custom pink
 			   lightpurple: '#D6A0FF', // Custom light purple
+			   lightpink: '#FFB6C1',
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {
