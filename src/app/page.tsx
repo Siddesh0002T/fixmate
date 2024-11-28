@@ -4,18 +4,18 @@ import Features from "@/components/Features"
 import HowFixMateWorks from "@/components/HowFixMateWorks";
 import GetStarted from "@/components/GetStarted";
 import Footer from "@/components/Footer";
-import { image } from "framer-motion/client";
 import { SubHero } from "@/components/SubHero";
+import { GlobeDemo } from "@/components/GlobeDemo";
 
 export default function Home() {
   return (
     <div className="">
-  
       <Navbar/>
      <Hero/>
      <Features/>
      <SubHero/>
      <HowFixMateWorks/>
+     <GlobeDemo/>
      <GetStarted/>
      <Footer/>
     </div>

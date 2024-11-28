@@ -10,6 +10,9 @@ export default {
   theme: {
   	extend: {
   		colors: {
+			purple: '#7c3aed', // Custom purple color
+			pink: '#d946ef', // Custom pink color
+			indigo: '#4c1d95', // Custom indigo color
 			customBlue: '#1E3A8A',  // Example custom blue
         customPink: '#F472B6',  // Example custom pink
 			   lightpurple: '#D6A0FF', // Custom light purple
