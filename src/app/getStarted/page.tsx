@@ -6,7 +6,6 @@ import GetStarted from "@/components/GetStarted";
 import Footer from "@/components/Footer";
 import { SubHero } from "@/components/SubHero";
 import { GlobeDemo } from "@/components/GlobeDemo";
-import AboutFixMate from "@/components/AboutFixMate";
 
 export default function About() {
   return (
@@ -14,8 +13,8 @@ export default function About() {
       <Navbar/>
 <br />
 <br />
+<GetStarted/>
 
-<AboutFixMate/>
      <Features/>
      <SubHero/>
      <HowFixMateWorks/>

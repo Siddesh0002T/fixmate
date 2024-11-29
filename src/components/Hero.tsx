@@ -22,7 +22,7 @@ const Hero = () => {
          Connect with skilled professionals for all your home maintenance and repair needs. From plumbing to electrical work, we've got you covered.
          </span>
          <br /><br />
-         <RainbowButton>Get Started</RainbowButton>
+         <a href="/getStarted"><RainbowButton>Get Started</RainbowButton></a>
        </ShineBorder>
   </>
   );
