@@ -2,6 +2,7 @@ import React from "react";
 import ShineBorder from "@/components/ui/shine-border";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import HyperText from "@/components/ui/hyper-text";
+import Link from "next/link";
 
 const Hero = () => {
   return (
@@ -19,10 +20,10 @@ const Hero = () => {
          </span>
          <br /><br />
          <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-black to-gray-300/80 bg-clip-text text-center text-2xl font-semibold leading-none text-transparent dark:from-white dark:to-slate-900/10">
-         Connect with skilled professionals for all your home maintenance and repair needs. From plumbing to electrical work, we've got you covered.
+         Connect with skilled professionals for all your home maintenance and repair needs. From plumbing to electrical work, weve got you covered.
          </span>
          <br /><br />
-         <a href="/getStarted"><RainbowButton>Get Started</RainbowButton></a>
+         <Link href="/getStarted"><RainbowButton>Get Started</RainbowButton></Link>
        </ShineBorder>
   </>
   );

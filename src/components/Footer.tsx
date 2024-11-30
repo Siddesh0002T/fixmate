@@ -1,5 +1,6 @@
 import React from "react";
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";  // Import icons for social media
+import Link from "next/link";
 
 const Footer = () => {
   return (
@@ -10,15 +11,15 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              <li><a href="#about" className="hover:text-purple-500">About Us</a></li>
-              <li><a href="#services" className="hover:text-purple-500">Services</a></li>
-              <li><a href="#professionals" className="hover:text-purple-500">Professionals</a></li>
-              <li><a href="#blog" className="hover:text-purple-500">Blog</a></li>
-              <li><a href="#support" className="hover:text-purple-500">Support</a></li>
-              <li><a href="#faqs" className="hover:text-purple-500">FAQs</a></li>
-              <li><a href="#contact" className="hover:text-purple-500">Contact Us</a></li>
-              <li><a href="#privacy" className="hover:text-purple-500">Privacy Policy</a></li>
-              <li><a href="#terms" className="hover:text-purple-500">Terms of Service</a></li>
+              <li><Link href="/about" className="hover:text-purple-500">About Us</Link></li>
+              <li><Link href="/services" className="hover:text-purple-500">Services</Link></li>
+              <li><Link href="/professionals" className="hover:text-purple-500">Professionals</Link></li>
+              <li><Link href="/blog" className="hover:text-purple-500">Blog</Link></li>
+              <li><Link href="/support" className="hover:text-purple-500">Support</Link></li>
+              <li><Link href="/faqs" className="hover:text-purple-500">FAQs</Link></li>
+              <li><Link href="/contact" className="hover:text-purple-500">Contact Us</Link></li>
+              <li><Link href="/privacy" className="hover:text-purple-500">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-purple-500">Terms of Service</Link></li>
             </ul>
           </div>
 

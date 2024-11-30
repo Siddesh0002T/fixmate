@@ -1,5 +1,3 @@
-import Navbar from "@/components/Navbar";
-import Hero from "@/components/Hero";
 import Features from "@/components/Features"
 import HowFixMateWorks from "@/components/HowFixMateWorks";
 import GetStarted from "@/components/GetStarted";
@@ -11,7 +9,7 @@ import AboutFixMate from "@/components/AboutFixMate";
 export default function About() {
   return (
     <div className="">
-      <Navbar/>
+ 
 <br />
 <br />
 

@@ -1,6 +1,7 @@
 import React from "react";
 import { FaWrench, FaPaintRoller, FaPlug, FaHammer } from "react-icons/fa";
 import ShimmerButton from "./ui/shimmer-button";
+import Link from "next/link";
 
 export default function Services() {
   return (
@@ -64,14 +65,14 @@ export default function Services() {
             Need something else? We offer a wide range of home repair and maintenance services.
           </p>
           <br />
-          <a
+          <Link
             href="/contact"
             className="inline-block"
           >
               <ShimmerButton className="shadow-md px-3 py-1 text-sm">
           <span className="text-center font-medium tracking-tight text-white">Contact Us</span>
         </ShimmerButton>
-          </a>
+          </Link>
         </div>
       </div>
     </section>

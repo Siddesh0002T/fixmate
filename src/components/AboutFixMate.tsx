@@ -24,7 +24,7 @@ export default function AboutFixMate() {
           </p>
 
           <p className="mb-6">
-            Whether it's a quick fix or a major project, FixMate is here to ensure your home stays in perfect condition, 
+            Whether its a quick fix or a major project, FixMate is here to ensure your home stays in perfect condition, 
             with services backed by experienced professionals and a user-friendly booking system.
           </p>
         </div>

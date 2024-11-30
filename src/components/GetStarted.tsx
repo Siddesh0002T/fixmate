@@ -7,7 +7,7 @@ const GetStarted = () => {
         <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
         <p className="text-lg mb-8">
           Join FixMate today and experience hassle-free home services. Whether
-          you're a homeowner or a skilled professional, we've got you covered.
+          youre a homeowner or a skilled professional, weve got you covered.
         </p>
         <div className="flex justify-center gap-6">
           <a

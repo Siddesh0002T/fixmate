@@ -1,4 +1,3 @@
-import Navbar from "@/components/Navbar";
 import Features from "@/components/Features"
 import HowFixMateWorks from "@/components/HowFixMateWorks";
 import GetStarted from "@/components/GetStarted";
@@ -10,7 +9,7 @@ import Services from "@/components/Services";
 export default function About() {
   return (
     <div className="">
-      <Navbar/>
+ 
 <br />
 <br />
 

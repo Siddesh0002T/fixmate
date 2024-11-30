@@ -6,6 +6,7 @@ import { auth } from "@/utils/firebase";
 import SparklesText from "@/components/ui/sparkles-text";
 import ShimmerButton from "@/components/ui/shimmer-button";
 import { FaBars, FaTimes } from "react-icons/fa";
+import Link from 'next/link';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -53,18 +54,18 @@ const Navbar = () => {
         } md:flex items-center space-x-6`}
       >
         <div className="flex space-x-6">
-          <a href="/" className="text-black hover:text-gray-500">
-            Home
-          </a>
-          <a href="/about" className="text-black hover:text-gray-500">
+          <Link href="/" className="text-black hover:text-gray-500">
+          Home
+          </Link>
+          <Link href="/about" className="text-black hover:text-gray-500">
             About
-          </a>
-          <a href="/services" className="text-black hover:text-gray-500">
+          </Link>
+          <Link href="/services" className="text-black hover:text-gray-500">
             Services
-          </a>
-          <a href="/contact" className="text-black hover:text-gray-500">
+          </Link>
+          <Link href="/contact" className="text-black hover:text-gray-500">
             Contact
-          </a>
+          </Link>
         </div>
         {user ? (
           <div className="relative group">
@@ -106,15 +107,15 @@ const Navbar = () => {
           isMenuOpen ? "block" : "hidden"
         } md:hidden absolute top-16 left-0 w-full bg-white p-4 shadow-md rounded-md space-y-4`}
       >
-        <a href="/about" className="text-black hover:text-gray-500 block">
+        <Link href="/about" className="text-black hover:text-gray-500 block">
           About
-        </a>
-        <a href="/services" className="text-black hover:text-gray-500 block">
+        </Link>
+        <Link href="/services" className="text-black hover:text-gray-500 block">
           Services
-        </a>
-        <a href="/contact" className="text-black hover:text-gray-500 block">
+        </Link>
+        <Link href="/contact" className="text-black hover:text-gray-500 block">
           Contact
-        </a>
+        </Link>
         {user ? (
           <button
             onClick={handleSignOut}
@@ -124,16 +125,16 @@ const Navbar = () => {
           </button>
         ) : (
           <>
-            <a href="/getStarted/auth/login">
+            <Link href="/getStarted/auth/login">
               <ShimmerButton className="shadow-md px-3 py-1 text-sm w-full">
                 <span className="text-center font-medium tracking-tight text-white">Log In</span>
               </ShimmerButton>
-            </a>
-            <a href="/getStarted/auth/signup">
+            </Link>
+            <Link href="/getStarted/auth/signup">
               <ShimmerButton className="shadow-md px-3 py-1 text-sm w-full">
                 <span className="text-center font-medium tracking-tight text-white">Sign Up</span>
               </ShimmerButton>
-            </a>
+            </Link>
           </>
         )}
       </div>
