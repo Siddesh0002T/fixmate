@@ -18,7 +18,7 @@ const GetStarted = () => {
             Find a Professional
           </Link>
           <Link
-            href="getStarted/join-professional"
+            href="dashboard/home"
             className="bg-transparent border-2 border-white text-white py-3 px-8 rounded-lg text-lg font-semibold hover:bg-white hover:text-black transition-colors"
           >
             Join as a Professional
