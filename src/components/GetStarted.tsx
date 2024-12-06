@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 const GetStarted = () => {
   return (
@@ -10,18 +11,18 @@ const GetStarted = () => {
           youre a homeowner or a skilled professional, weve got you covered.
         </p>
         <div className="flex justify-center gap-6">
-          <a
-            href="#find-professional"
+          <Link
+            href="/find-professional"
             className="bg-white text-black py-3 px-8 rounded-lg text-lg font-semibold hover:bg-gray-200 transition-colors"
           >
             Find a Professional
-          </a>
-          <a
-            href="#join-professional"
+          </Link>
+          <Link
+            href="getStarted/join-professional"
             className="bg-transparent border-2 border-white text-white py-3 px-8 rounded-lg text-lg font-semibold hover:bg-white hover:text-black transition-colors"
           >
             Join as a Professional
-          </a>
+          </Link>
         </div>
       </div>
     </section>

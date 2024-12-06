@@ -8,6 +8,7 @@ import ShimmerButton from "@/components/ui/shimmer-button";
 import { FaBars, FaTimes } from "react-icons/fa";
 import Link from 'next/link';
 
+
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
