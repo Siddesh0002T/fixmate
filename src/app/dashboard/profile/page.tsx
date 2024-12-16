@@ -1,133 +1,213 @@
-"use client"; // Add this line at the top of your file
+"use client";
 
-import { useState, useEffect } from 'react';
 import Sidebar from "@/components/Sidebar";
-import { FiHome, FiSettings, FiUser , FiBriefcase } from 'react-icons/fi';
-import { getDatabase, ref, onValue, set } from 'firebase/database';
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import React, { useEffect, useState } from "react";
+import { auth, db } from "@/utils/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useRouter } from "next/navigation";
+import { FiHome, FiUser, FiSettings, FiBriefcase } from 'react-icons/fi';
 
-export default function Profile() {
-  const [userData, setUserData] = useState({
-    fullName: '',
-    email: '',
-    phoneNumber: '',
-    about: '',
-    address: '',
-    profession: '', // Add profession field
-    profilePic: '',
-    isPublished: false,
+const menuItems = [
+  { label: 'Home', icon: <FiHome />, link: '/dashboard/home' },
+  { label: 'Profile', icon: <FiUser />, link: '/dashboard/profile' },
+  { label: 'Bookings', icon: <FiBriefcase />, link: '/dashboard/bookings' },
+  { label: 'Settings', icon: <FiSettings />, link: '/dashboard/settings' },
+];
+
+const ProfilePage = () => {
+  const [user, loading] = useAuthState(auth);
+  const [profile, setProfile] = useState<any>({
+    displayName: "",
+    email: "",
+    photoURL: "",
+    age: "",
+    phone: "",
+    profession: "",
+    experience: "",
+    address: "",
+    about: "",
   });
-  const [file, setFile] = useState(null);
-  const db = getDatabase();
-  const storage = getStorage();
+  const [completion, setCompletion] = useState(0);
+  const router = useRouter();
 
-  const menuItems = [
-    { label: 'Home', icon: <FiHome />, link: '/dashboard/home' },
-    { label: 'Profile', icon: <FiUser  />, link: '/dashboard/profile' },
-    { label: 'Bookings', icon: <FiBriefcase />, link: '/dashboard/bookings' },
-    { label: 'Settings', icon: <FiSettings />, link: '/dashboard/settings' },
-  ];
-
+  // Fetch user data from Firestore
   useEffect(() => {
-    const userRef = ref(db, 'users/userId'); // Replace 'userId' with the actual user ID
-    onValue(userRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        setUserData(data);
-      }
-    });
-  }, [db]);
+    if (user) {
+      const fetchProfile = async () => {
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
 
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUserData((prevData) => ({ ...prevData, [name]: value }));
-  };
-
-  const handleTogglePublish = () => {
-    setUserData((prevData) => ({ ...prevData, isPublished: !prevData.isPublished }));
-  };
-
-  const handleSaveChanges = async () => {
-    if (file) {
-      const storageReference = storageRef(storage, `profilePics/${file.name}`);
-      await uploadBytes(storageReference, file);
-      const downloadURL = await getDownloadURL(storageReference);
-      userData.profilePic = downloadURL; // Update profilePic with the uploaded URL
+        if (docSnap.exists()) {
+          setProfile({ ...profile, ...docSnap.data() });
+        } else {
+          // If no profile, use Google account details as defaults
+          setProfile({
+            displayName: user.displayName || "",
+            email: user.email || "",
+            photoURL: user.photoURL || "",
+            age: "",
+            phone: "",
+            profession: "",
+            experience: "",
+            address: "",
+            about: "",
+          });
+        }
+      };
+      fetchProfile();
     }
+  }, [user]);
 
-    // Save user data to Firebase
-    const userRef = ref(db, 'users/userId'); // Replace 'userId' with the actual user ID
-    await set(userRef, userData);
-    alert('Profile updated successfully!');
+  // Calculate profile completion percentage
+  useEffect(() => {
+    const filledFields = Object.values(profile).filter((field) => field !== "").length;
+    const totalFields = Object.keys(profile).length;
+    setCompletion(Math.round((filledFields / totalFields) * 100));
+  }, [profile]);
+
+  // Handle form submission
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      await setDoc(doc(db, "users", user.uid), profile);
+      alert("Profile updated successfully!");
+    } catch (error) {
+      console.error("Error updating profile: ", error);
+      alert("Failed to save changes.");
+    }
   };
+
+  if (loading) return <p>Loading...</p>;
+  if (!user) {
+    router.push("/login");
+    return null;
+  }
 
   return (
     <div className="flex">
-      {/* Sidebar */}
       <Sidebar menuItems={menuItems} />
-
-      {/* Main Content */}
-      <div className="flex-1 ml-64 p-6">
-        <h1 className="text-2xl font-semibold">Profile</h1>
-        <p className="mt-4 text-lg text-gray-600">
-          Manage your personal information and update your profile.
-        </p>
-
-        {/* Profile Information */}
-        <div className="mt-8 bg-white shadow-sm rounded-lg p-6">
-          <h2 className="text-xl font-medium text-gray-800">Personal Information</h2>
-          
-          <div className="mt-4">
-            {/* Profile Picture Upload */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Profile Picture</label>
-              <input type="file" onChange={handleFileChange} className="mt-1 block w-full" />
-              {userData.profilePic && <img src={userData.profilePic} alt="Profile" className="mt-2 w-24 h-24 rounded-full" />}
-            </div>
-
-            {/* Editable Fields */}
-            {['fullName', 'email', 'phoneNumber', 'about', 'address', 'profession'].map((field) => (
-              <div className="mb-4" key={field}>
-                <label className="block text-sm font-medium text-gray-700">{field.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}</label>
-                <input
-                  type="text"
-                  name={field}
-                  value={userData[field]}
-                  onChange={handleChange}
-                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md"
-                />
-              </div>
-            ))}
-
-            {/* Toggle for Profile Visibility */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700">Profile Visibility</label>
-              <button
-                onClick={handleTogglePublish}
-                className={`mt-1 px-4 py-2 rounded-md ${userData.isPublished ? 'bg-green-600' : 'bg-red-600'} text-white`}
-              >
-                {userData.isPublished ? 'Unpublish Profile' : 'Publish Profile'}
-              </button>
-            </div>
-
-            {/* Save Changes Button */}
-            <div className="flex justify-end">
-              <button onClick={handleSaveChanges} className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-md">
-                Save Changes
-              </button>
-            </div>
+      <div className="flex-1 ml-64 p-6 bg-gray-100">
+      <br /><br /><br />
+      
+        <h1 className="text-2xl font-semibold">Profile </h1>
+        {/* Your page content here */}
+        <div className="min-h-screen flex flex-col items-center bg-gray-100 py-12 px-6">
+      <div className="w-full max-w-2xl bg-white rounded-lg shadow p-6 space-y-6">
+        {/* Profile Picture */}
+        <div className="flex items-center space-x-4">
+          <img
+            src={profile.photoURL || "/default-avatar.png"}
+            alt="Profile"
+            className="w-20 h-20 rounded-full object-cover"
+          />
+          <div>
+            <p className="text-gray-800 font-bold">{profile.displayName}</p>
+            <button
+              className="text-sm text-blue-500 hover:underline"
+              onClick={() => alert("Change your profile picture via Google account.")}
+            >
+              Change Profile Picture
+            </button>
           </div>
         </div>
 
-        {/* Footer or additional sections */}
-        <footer className="mt-8 text-center text-gray-500 text-sm">
-          &copy; 2024 FixMate. All rights reserved.
-        </footer>
+        {/* Profile Completion */}
+        <div className="w-full bg-gray-200 rounded-full h-4">
+          <div
+            className="bg-blue-600 h-4 rounded-full"
+            style={{ width: `${completion}%` }}
+          ></div>
+        </div>
+        <p className="text-sm text-gray-600">Profile Completion: {completion}%</p>
+
+        {/* Profile Form */}
+        <form onSubmit={handleSave} className="space-y-4">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700">Full Name</label>
+            <input
+              type="text"
+              value={profile.displayName}
+              onChange={(e) => setProfile({ ...profile, displayName: e.target.value })}
+              className="w-full border border-gray-300 rounded-lg p-2"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700">Email</label>
+            <input
+              type="email"
+              value={profile.email}
+              readOnly
+              className="w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700">Age</label>
+            <input
+              type="number"
+              value={profile.age}
+              onChange={(e) => setProfile({ ...profile, age: e.target.value })}
+              className="w-full border border-gray-300 rounded-lg p-2"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700">Phone</label>
+            <input
+              type="tel"
+              value={profile.phone}
+              onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+              className="w-full border border-gray-300 rounded-lg p-2"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700">Profession</label>
+            <input
+              type="text"
+              value={profile.profession}
+              onChange={(e) => setProfile({ ...profile, profession: e.target.value })}
+              className="w-full border border-gray-300 rounded-lg p-2"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700">Experience</label>
+            <input
+              type="text"
+              value={profile.experience}
+              onChange={(e) => setProfile({ ...profile, experience: e.target.value })}
+              className="w-full border border-gray-300 rounded-lg p-2"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700">Address</label>
+            <input
+              type="text"
+              value={profile.address}
+              onChange={(e) => setProfile({ ...profile, address: e.target.value })}
+              className="w-full border border-gray-300 rounded-lg p-2"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700">About</label>
+            <textarea
+              value={profile.about}
+              onChange={(e) => setProfile({ ...profile, about: e.target.value })}
+              className="w-full border border-gray-300 rounded-lg p-2"
+            ></textarea>
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg"
+          >
+            Save Changes
+          </button>
+        </form>
+      </div>
+    </div>
+<br /><br />
+     
       </div>
     </div>
   );
-}
+};
+
+export default ProfilePage;

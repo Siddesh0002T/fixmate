@@ -12,7 +12,7 @@ const GetStarted = () => {
         </p>
         <div className="flex justify-center gap-6">
           <Link
-            href="/find-professional"
+            href="/fine-professional"
             className="bg-white text-black py-3 px-8 rounded-lg text-lg font-semibold hover:bg-gray-200 transition-colors"
           >
             Find a Professional
