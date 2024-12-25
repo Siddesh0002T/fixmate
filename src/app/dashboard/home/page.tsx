@@ -161,121 +161,95 @@ const ProfilePage = () => {
             <p className="text-sm text-gray-600">Profile Completion: {completion}%</p>
 
             {/* Like and View Counts */}
-            <div className="flex items-center space-x-4 mt-4">
-              <div>
-                <button
-                  className="bg-blue-500 text-white px-4 py-2 rounded-lg"
-                  onClick={handleLike}
-                >
-                  Like {profile.likes}
-                </button>
-              </div>
-              <div>
-                <button
-                  className="bg-green-500 text-white px-4 py-2 rounded-lg"
-                  onClick={incrementViewCount}
-                >
-                  View Profile {profile.views}
-                </button>
-              </div>
-            </div>
+            <div className="flex flex-col items-center space-y-6 mt-6">
+  {/* Like and View Counts */}
+  <div className="flex items-center justify-center space-x-8">
+    {/* Likes Section */}
+    <div className="text-center">
+      <p className="text-xl font-semibold text-gray-800">{profile.likes}</p>
+      <p className="text-sm text-gray-600">Likes</p>
+  
+    </div>
 
-            {/* Rating Section */}
-            <div className="mt-4">
-              <p className="text-gray-800">Rating: {profile.rating}</p>
-              <div className="flex space-x-2">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    className={`text-yellow-500 ${profile.rating >= star ? 'font-bold' : ''}`}
-                    onClick={() => handleRating(star)}
-                  >
-                    ★
-                  </button>
-                ))}
-              </div>
-            </div>
+    {/* Views Section */}
+    <div className="text-center">
+      <p className="text-xl font-semibold text-gray-800">{profile.views}</p>
+      <p className="text-sm text-gray-600">Views</p>
+    </div>
+  </div>
+
+  {/* Rating Section */}
+  <div className="text-center">
+    <p className="text-xl font-semibold text-gray-800">Rating: {profile.rating}</p>
+    <div className="flex justify-center space-x-2 mt-2">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          className={`text-3xl ${
+            profile.rating >= star ? "text-yellow-500 font-bold" : "text-gray-400"
+          }`}
+          onClick={() => handleRating(star)}
+          disabled={user.uid === profile.uid} // Disable if viewing own profile
+          style={{
+            cursor: user.uid === profile.uid ? "not-allowed" : "pointer",
+          }}
+        >
+          ★
+        </button>
+      ))}
+    </div>
+  </div>
+</div>
 
             {/* Profile Form */}
-            <form onSubmit={handleSave} className="space-y-4 mt-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700">Full Name</label>
-                <input
-                  type="text"
-                  value={profile.displayName}
-                  onChange={(e) => setProfile({ ...profile, displayName: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg p-2"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700">Email</label>
-                <input
-                  type="email"
-                  value={profile.email}
-                  readOnly
-                  className="w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700">Age</label>
-                <input
-                  type="number"
-                  value={profile.age}
-                  onChange={(e) => setProfile({ ...profile, age: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg p-2"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700">Phone</label>
-                <input
-                  type="tel"
-                  value={profile.phone}
-                  onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg p-2"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700">Profession</label>
-                <input
-                  type="text"
-                  value={profile.profession}
-                  onChange={(e) => setProfile({ ...profile, profession: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg p-2"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700">Experience</label>
-                <input
-                  type="text"
-                  value={profile.experience}
-                  onChange={(e) => setProfile({ ...profile, experience: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg p-2"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700">Address</label>
-                <input
-                  type="text"
-                  value={profile.address}
-                  onChange={(e) => setProfile({ ...profile, address: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg p-2"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700">About</label>
-                <textarea
-                  value={profile.about}
-                  onChange={(e) => setProfile({ ...profile, about: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg p-2"
-                ></textarea>
-              </div>
-              <button
-                type="submit"
-                className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg"
-              >
-                Save Changes
-              </button>
-            </form>
+
+            <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-lg p-6 space-y-6">
+
+
+  <div className="space-y-4">
+    <div className="flex justify-between">
+      <h3 className="text-sm font-semibold text-gray-700">Full Name</h3>
+      <p className="text-gray-900">{profile.displayName || "John Doe"}</p>
+    </div>
+
+    <div className="flex justify-between">
+      <h3 className="text-sm font-semibold text-gray-700">Email</h3>
+      <p className="text-gray-900">{profile.email || "example@example.com"}</p>
+    </div>
+
+    <div className="flex justify-between">
+      <h3 className="text-sm font-semibold text-gray-700">Age</h3>
+      <p className="text-gray-900">{profile.age || "N/A"}</p>
+    </div>
+
+    <div className="flex justify-between">
+      <h3 className="text-sm font-semibold text-gray-700">Phone</h3>
+      <p className="text-gray-900">{profile.phone || "123-456-7890"}</p>
+    </div>
+
+    <div className="flex justify-between">
+      <h3 className="text-sm font-semibold text-gray-700">Profession</h3>
+      <p className="text-gray-900">{profile.profession || "N/A"}</p>
+    </div>
+
+    <div className="flex justify-between">
+      <h3 className="text-sm font-semibold text-gray-700">Experience</h3>
+      <p className="text-gray-900">{profile.experience || "N/A"}</p>
+    </div>
+
+    <div className="flex justify-between">
+      <h3 className="text-sm font-semibold text-gray-700">Address</h3>
+      <p className="text-gray-900">{profile.address || "N/A"}</p>
+    </div>
+
+    <div className="flex justify-between">
+      <h3 className="text-sm font-semibold text-gray-700">About</h3>
+      <p className="text-gray-900">{profile.about || "N/A"}</p>
+    </div>
+  </div>
+</div>
+
+
           </div>
         </div>
 

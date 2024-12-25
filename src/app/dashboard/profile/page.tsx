@@ -29,6 +29,7 @@ const ProfilePage = () => {
     about: "",
   });
   const [completion, setCompletion] = useState(0);
+  const [status, setStatus] = useState(0); // Added status field
   const router = useRouter();
 
   // Fetch user data from Firestore
@@ -59,18 +60,27 @@ const ProfilePage = () => {
     }
   }, [user]);
 
-  // Calculate profile completion percentage
+  // Calculate profile completion percentage and update status
   useEffect(() => {
     const filledFields = Object.values(profile).filter((field) => field !== "").length;
     const totalFields = Object.keys(profile).length;
-    setCompletion(Math.round((filledFields / totalFields) * 100));
+    const completionPercentage = Math.round((filledFields / totalFields) * 100);
+    setCompletion(completionPercentage);
+
+    // Update status based on profile completion
+    if (completionPercentage === 100) {
+      setStatus(1); // Profile is 100% complete
+    } else {
+      setStatus(0); // Profile is not 100% complete
+    }
   }, [profile]);
 
   // Handle form submission
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      await setDoc(doc(db, "users", user.uid), profile);
+      // Add the status to the profile data
+      await setDoc(doc(db, "users", user.uid), { ...profile, status });
       alert("Profile updated successfully!");
     } catch (error) {
       console.error("Error updating profile: ", error);
@@ -88,123 +98,124 @@ const ProfilePage = () => {
     <div className="flex">
       <Sidebar menuItems={menuItems} />
       <div className="flex-1 ml-64 p-6 bg-gray-100">
-      <br /><br /><br />
-      
+        <br /><br /><br />
         <h1 className="text-2xl font-semibold">Profile </h1>
-        {/* Your page content here */}
         <div className="min-h-screen flex flex-col items-center bg-gray-100 py-12 px-6">
-      <div className="w-full max-w-2xl bg-white rounded-lg shadow p-6 space-y-6">
-        {/* Profile Picture */}
-        <div className="flex items-center space-x-4">
-          <img
-            src={profile.photoURL || "/default-avatar.png"}
-            alt="Profile"
-            className="w-20 h-20 rounded-full object-cover"
-          />
-          <div>
-            <p className="text-gray-800 font-bold">{profile.displayName}</p>
-            <button
-              className="text-sm text-blue-500 hover:underline"
-              onClick={() => alert("Change your profile picture via Google account.")}
-            >
-              Change Profile Picture
-            </button>
+          <div className="w-full max-w-2xl bg-white rounded-lg shadow p-6 space-y-6">
+            {/* Profile Picture */}
+            <div className="flex items-center space-x-4">
+              <img
+                src={profile.photoURL || "/default-avatar.png"}
+                alt="Profile"
+                className="w-20 h-20 rounded-full object-cover"
+              />
+              <div>
+                <p className="text-gray-800 font-bold">{profile.displayName}</p>
+                <button
+                  className="text-sm text-blue-500 hover:underline"
+                  onClick={() => alert("Change your profile picture via Google account.")}
+                >
+                  Change Profile Picture
+                </button>
+              </div>
+            </div>
+
+            {/* Profile Completion */}
+            <div className="w-full bg-gray-200 rounded-full h-4">
+              <div
+                className="bg-blue-600 h-4 rounded-full"
+                style={{ width: `${completion}%` }}
+              ></div>
+            </div>
+            <p className="text-sm text-gray-600">Profile Completion: {completion}%</p>
+
+            {/* Profile Form */}
+            <form onSubmit={handleSave} className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700">Full Name</label>
+                <input
+                  type="text"
+                  value={profile.displayName}
+                  onChange={(e) => setProfile({ ...profile, displayName: e.target.value })}
+                  className="w-full border border-gray-300 rounded-lg p-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700">Email</label>
+                <input
+                  type="email"
+                  value={profile.email}
+                  readOnly
+                  className="w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700">Age</label>
+                <input
+                  type="number"
+                  value={profile.age}
+                  onChange={(e) => setProfile({ ...profile, age: e.target.value })}
+                  className="w-full border border-gray-300 rounded-lg p-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700">Phone</label>
+                <input
+                  type="tel"
+                  value={profile.phone}
+                  onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                  className="w-full border border-gray-300 rounded-lg p-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700">Profession</label>
+                <input
+                  type="text"
+                  value={profile.profession}
+                  onChange={(e) => setProfile({ ...profile, profession: e.target.value })}
+                  className="w-full border border-gray-300 rounded-lg p-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700">Experience</label>
+                <input
+                  type="text"
+                  value={profile.experience}
+                  onChange={(e) => setProfile({ ...profile, experience: e.target.value })}
+                  className="w-full border border-gray-300 rounded-lg p-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700">Address</label>
+                <input
+                  type="text"
+                  value={profile.address}
+                  onChange={(e) => setProfile({ ...profile, address: e.target.value })}
+                  className="w-full border border-gray-300 rounded-lg p-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700">About</label>
+                <textarea
+                  value={profile.about}
+                  onChange={(e) => setProfile({ ...profile, about: e.target.value })}
+                  className="w-full border border-gray-300 rounded-lg p-2"
+                ></textarea>
+              </div>
+
+              {/* Hidden status field */}
+              <input type="hidden" value={status} name="status" />
+
+              <button
+                type="submit"
+                className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg"
+              >
+                Save Changes
+              </button>
+            </form>
           </div>
         </div>
-
-        {/* Profile Completion */}
-        <div className="w-full bg-gray-200 rounded-full h-4">
-          <div
-            className="bg-blue-600 h-4 rounded-full"
-            style={{ width: `${completion}%` }}
-          ></div>
-        </div>
-        <p className="text-sm text-gray-600">Profile Completion: {completion}%</p>
-
-        {/* Profile Form */}
-        <form onSubmit={handleSave} className="space-y-4">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700">Full Name</label>
-            <input
-              type="text"
-              value={profile.displayName}
-              onChange={(e) => setProfile({ ...profile, displayName: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg p-2"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700">Email</label>
-            <input
-              type="email"
-              value={profile.email}
-              readOnly
-              className="w-full border border-gray-300 rounded-lg p-2 bg-gray-100"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700">Age</label>
-            <input
-              type="number"
-              value={profile.age}
-              onChange={(e) => setProfile({ ...profile, age: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg p-2"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700">Phone</label>
-            <input
-              type="tel"
-              value={profile.phone}
-              onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg p-2"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700">Profession</label>
-            <input
-              type="text"
-              value={profile.profession}
-              onChange={(e) => setProfile({ ...profile, profession: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg p-2"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700">Experience</label>
-            <input
-              type="text"
-              value={profile.experience}
-              onChange={(e) => setProfile({ ...profile, experience: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg p-2"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700">Address</label>
-            <input
-              type="text"
-              value={profile.address}
-              onChange={(e) => setProfile({ ...profile, address: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg p-2"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700">About</label>
-            <textarea
-              value={profile.about}
-              onChange={(e) => setProfile({ ...profile, about: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg p-2"
-            ></textarea>
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white font-bold py-2 rounded-lg"
-          >
-            Save Changes
-          </button>
-        </form>
-      </div>
-    </div>
-<br /><br />
-     
+        <br /><br />
       </div>
     </div>
   );

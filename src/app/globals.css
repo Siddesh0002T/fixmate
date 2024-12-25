@@ -109,3 +109,42 @@ body {
   -webkit-background-clip: text; /* Clip the background to the text */
   color: transparent; /* Make the text transparent so the gradient shows */
 }
+/* Add this to your CSS file */
+.toggle-checkbox:checked {
+  transform: translateX(1.5rem); /* Moves the circle when toggled */
+}
+
+.toggle-label {
+  position: relative;
+}
+
+.toggle-checkbox {
+  appearance: none;
+  width: 2.5rem;
+  height: 1.5rem;
+  border-radius: 9999px;
+  background-color: #d1d5db; /* Light gray when off */
+  border: 2px solid #ccc;
+  transition: 0.2s ease-in-out;
+}
+
+.toggle-checkbox:checked {
+  background-color: #10b981; /* Green when on */
+}
+
+.toggle-checkbox:checked + .toggle-label {
+  background-color: #10b981;
+}
+
+.toggle-label {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: #d1d5db;
+  border-radius: 9999px;
+  position: relative;
+}
+
+.toggle-checkbox:checked + .toggle-label {
+  background-color: #10b981;
+}
