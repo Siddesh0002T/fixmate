@@ -35,111 +35,115 @@ const Navbar = () => {
 
   return (
     <nav className="fixed top-0 left-0 w-full bg-white/30 backdrop-blur-md shadow-md z-50 p-4 flex justify-between items-center">
-      {/* Logo */}
-      <div className="flex items-center">
-        <SparklesText
-          text="FixMate"
-          className="text-black text-3xl font-bold flex-shrink-0"
+  {/* Logo */}
+  <div className="flex items-center">
+    <SparklesText
+      text="FixMate"
+      className="text-black text-3xl font-bold flex-shrink-0"
+    />
+  </div>
+
+  {/* Hamburger Menu Icon for Mobile */}
+  <div className="md:hidden flex items-center" onClick={toggleMenu}>
+    {isMenuOpen ? <FaTimes className="text-black text-2xl" /> : <FaBars className="text-black text-2xl" />}
+  </div>
+
+  {/* Desktop Navigation */}
+  <div className={`hidden md:flex items-center space-x-6`}>
+    <Link href="/" className="text-black hover:text-gray-500">
+      Home
+    </Link>
+    <Link href="/about" className="text-black hover:text-gray-500">
+      About
+    </Link>
+    <Link href="/services" className="text-black hover:text-gray-500">
+      Services
+    </Link>
+    <Link href="/contact" className="text-black hover:text-gray-500">
+      Contact
+    </Link>
+    {user ? (
+      <div className="relative group">
+        <img
+          src={user.photoURL || "/default-avatar.png"}
+          alt="User Avatar"
+          className="w-10 h-10 rounded-full border border-gray-300 cursor-pointer"
         />
-      </div>
-
-      {/* Hamburger Menu Icon for Mobile */}
-      <div className="md:hidden flex items-center" onClick={toggleMenu}>
-        {isMenuOpen ? <FaTimes className="text-black text-2xl" /> : <FaBars className="text-black text-2xl" />}
-      </div>
-
-      {/* Navigation Links and Buttons */}
-      <div
-        className={`${
-          isMenuOpen ? "block" : "hidden"
-        } md:flex items-center space-x-6`}
-      >
-        <div className="flex space-x-6">
-          <Link href="/" className="text-black hover:text-gray-500">
-          Home
-          </Link>
-          <Link href="/about" className="text-black hover:text-gray-500">
-            About
-          </Link>
-          <Link href="/services" className="text-black hover:text-gray-500">
-            Services
-          </Link>
-          <Link href="/contact" className="text-black hover:text-gray-500">
-            Contact
-          </Link>
-        </div>
-        {user ? (
-          <div className="relative group">
-            <img
-              src={user.photoURL || "/default-avatar.png"} // Use user's photoURL or default avatar
-              alt="User Avatar"
-              className="w-10 h-10 rounded-full border border-gray-300 cursor-pointer"
-            />
-            <div className="absolute right-0 mt-2 w-40 bg-white text-gray-800 rounded-lg shadow-lg hidden group-hover:block">
-              <p className="px-4 py-2 text-sm font-medium">{user.displayName || "User"}</p>
-              <hr />
-              <button
-                onClick={handleSignOut}
-                className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        ) : (
-          <>
-            <a href="/getStarted/auth/login">
-              <ShimmerButton className="shadow-md px-3 py-1 text-sm">
-                <span className="text-center font-medium tracking-tight text-white">Log In</span>
-              </ShimmerButton>
-            </a>
-            <a href="/getStarted/auth/signup">
-              <ShimmerButton className="shadow-md px-3 py-1 text-sm">
-                <span className="text-center font-medium tracking-tight text-white">Sign Up</span>
-              </ShimmerButton>
-            </a>
-          </>
-        )}
-      </div>
-
-      {/* Mobile Menu */}
-      <div
-        className={`${
-          isMenuOpen ? "block" : "hidden"
-        } md:hidden absolute top-16 left-0 w-full bg-white p-4 shadow-md rounded-md space-y-4`}
-      >
-        <Link href="/about" className="text-black hover:text-gray-500 block">
-          About
-        </Link>
-        <Link href="/services" className="text-black hover:text-gray-500 block">
-          Services
-        </Link>
-        <Link href="/contact" className="text-black hover:text-gray-500 block">
-          Contact
-        </Link>
-        {user ? (
+        <div className="absolute right-0 mt-2 w-40 bg-white text-gray-800 rounded-lg shadow-lg hidden group-hover:block">
+          <p className="px-4 py-2 text-sm font-medium">{user.displayName || "User"}</p>
+          <hr />
           <button
             onClick={handleSignOut}
-            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 bg-gray-200 rounded"
+            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
           >
             Logout
           </button>
-        ) : (
-          <>
-            <Link href="/getStarted/auth/login">
-              <ShimmerButton className="shadow-md px-3 py-1 text-sm w-full">
-                <span className="text-center font-medium tracking-tight text-white">Log In</span>
-              </ShimmerButton>
-            </Link>
-            <Link href="/getStarted/auth/signup">
-              <ShimmerButton className="shadow-md px-3 py-1 text-sm w-full">
-                <span className="text-center font-medium tracking-tight text-white">Sign Up</span>
-              </ShimmerButton>
-            </Link>
-          </>
-        )}
+        </div>
       </div>
-    </nav>
+    ) : (
+      <>
+        <Link href="/getStarted/auth/login">
+          <ShimmerButton className="shadow-md px-3 py-1 text-sm">
+            <span className="text-center font-medium tracking-tight text-white">Log In</span>
+          </ShimmerButton>
+        </Link>
+        <Link href="/getStarted/auth/signup">
+          <ShimmerButton className="shadow-md px-3 py-1 text-sm">
+            <span className="text-center font-medium tracking-tight text-white">Sign Up</span>
+          </ShimmerButton>
+        </Link>
+      </>
+    )}
+  </div>
+
+  {/* Mobile Menu */}
+  <div
+    className={`${
+      isMenuOpen ? "block" : "hidden"
+    } md:hidden absolute top-16 left-0 w-full bg-white p-4 shadow-md rounded-md space-y-4`}
+  ><hr />
+    <Link href="/" className="text-black hover:text-gray-500 block">
+      Home
+    </Link>
+    
+    <Link href="/about" className="text-black hover:text-gray-500 block">
+      About
+    </Link>
+    <Link href="/services" className="text-black hover:text-gray-500 block">
+      Services
+    </Link>
+    <Link href="/contact" className="text-black hover:text-gray-500 block">
+      Contact
+    </Link>
+    <br />
+    {user ? (
+      <button
+        onClick={handleSignOut}
+        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 bg-gray-200 rounded"
+      >
+        Logout
+      </button>
+    ) : (
+      <>
+      
+        <Link href="/getStarted/auth/login">
+          <ShimmerButton className="shadow-md px-3 py-1 text-sm w-full">
+            <span className="text-center font-medium tracking-tight text-white">Log In</span>
+          </ShimmerButton>
+        </Link>
+        
+        <br />
+        <Link href="/getStarted/auth/signup">
+          <ShimmerButton className="shadow-md px-3 py-1 text-sm w-full">
+            <span className="text-center font-medium tracking-tight text-white">Sign Up</span>
+          </ShimmerButton>
+        </Link>
+      </>
+    )}
+    <hr />
+  </div>
+</nav>
+
   );
 };
 
