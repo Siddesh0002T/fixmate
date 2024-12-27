@@ -101,7 +101,7 @@ const Navbar = () => {
     <div
       className={`${
         isMenuOpen ? "block" : "hidden"
-      } md:hidden bg-white rounded-lg shadow-md mt-4 p-4 transition-all ease-in-out duration-300`}
+      } md:hidden bg-white rounded-lg shadow-md mt-4 p-4 transition-all ease-in-out duration-300 `}
     >
       <Link href="/" className="block text-black hover:text-gray-600 py-2 transition">
         Home
