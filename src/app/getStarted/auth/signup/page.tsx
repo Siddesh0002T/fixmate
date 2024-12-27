@@ -4,7 +4,6 @@ import React from "react";
 import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "@/utils/firebase";
 import { useRouter } from "next/navigation";
-import Navbar from "@/components/Navbar";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 
 const SignupPage = () => {
@@ -36,7 +35,7 @@ const SignupPage = () => {
 
   return (
     <>
-      <Navbar />
+      
       <div className="min-h-screen flex flex-col items-center justify-center bg-white text-gray-800 px-4 py-12">
         <h1 className="text-3xl font-bold mb-6 text-center text-black">
           Sign Up for <span className="text-gradient">FixMate</span>
@@ -88,9 +87,6 @@ const SignupPage = () => {
             onClick={handleGoogleSignUp}
             className="p-3 bg-red-600 rounded-lg hover:bg-red-700 text-white font-semibold flex items-center space-x-2"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24" height="24" className="fill-current">
-              <path d="M23.49 12.3c0-.72-.06-1.38-.17-2h-9.1v3.06h5.31c-1.29 3.02-4.99 5.24-9.3 5.24-5.49 0-9.94-4.46-9.94-9.94s4.46-9.94 9.94-9.94c2.77 0 5.27 1.03 7.17 2.76l3.98-3.98c-2.95-2.67-6.84-4.34-11.15-4.34-8.19 0-14.85 6.66-14.85 14.85s6.66 14.85 14.85 14.85c8.25 0 14.85-6.6 14.85-14.85z"/>
-            </svg>
             <span>Sign Up with Google</span>
           </button>
         </div>
