@@ -143,7 +143,8 @@ const FindUsers = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-xl p-6 space-y-4">
+      <br /><br />
+      
 
         {/* Search Bar */}
         <form
@@ -154,7 +155,7 @@ const FindUsers = () => {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by any user detail..."
+            placeholder="Search Worker"
             className="flex-1 border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
@@ -248,7 +249,7 @@ const FindUsers = () => {
             <p className="text-center text-gray-600">No users found.</p>
           )}
         </div>
-      </div>
+      
 
       {/* Modal for Booking Confirmation */}
       {isModalOpen && (
