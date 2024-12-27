@@ -148,3 +148,21 @@ body {
 .toggle-checkbox:checked + .toggle-label {
   background-color: #10b981;
 }
+@keyframes slide-in {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+
+.backdrop-blur-md {
+  backdrop-filter: blur(10px);
+}
