@@ -2,10 +2,13 @@
 
 import React, { useEffect, useState } from "react";
 import { db } from "@/utils/firebase";
-import { collection, getDocs, updateDoc, doc, arrayUnion, getDoc, addDoc } from "firebase/firestore";
+import { collection,arrayRemove, getDocs, updateDoc, doc, arrayUnion, getDoc, addDoc } from "firebase/firestore";
 import { FiSearch, FiThumbsUp } from "react-icons/fi";
 import { FaRegCalendarAlt, FaStar } from "react-icons/fa"; // Importing calendar and star icons
 import Loader from "@/components/Loader";
+import router from "next/router";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/utils/firebase";
 
 const FindUsers = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -26,24 +29,36 @@ const FindUsers = () => {
     try {
       const userCollection = collection(db, "users");
       const querySnapshot = await getDocs(userCollection);
-      const fetchedUsers: any[] = [];
-      querySnapshot.forEach((doc) => {
-        fetchedUsers.push({ id: doc.id, ...doc.data() });
-      });
-      const shuffledUsers = shuffleArray(fetchedUsers);
-      setUsers(shuffledUsers);
+      const fetchedUsers = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(), // Include all fields, including `likes`
+      }));
+      setUsers(fetchedUsers);
     } catch (error) {
       console.error("Error fetching users:", error);
     } finally {
       setLoading(false);
     }
   };
+  
 
   // Fetch current user data
-  const fetchCurrentUser = async () => {
-    // Assuming the current user is already authenticated and you have their ID
-    const userDoc = await getDoc(doc(db, "users", "currentUserId")); // Replace "currentUserId" with the actual user ID
-    setCurrentUser(userDoc.data());
+  const fetchCurrentUser = () => {
+    // Use Firebase's onAuthStateChanged to track the current user
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Set the current user object
+        setCurrentUser({
+          id: user.uid,
+          email: user.email,
+          displayName: user.displayName || "Anonymous",
+          likedProfiles: [], // Ensure likedProfiles is initialized
+        });
+      } else {
+        // If no user is logged in, set currentUser to null
+        setCurrentUser(null);
+      }
+    });
   };
 
   useEffect(() => {
@@ -60,40 +75,59 @@ const FindUsers = () => {
 
   // Handle Like/Unlike
   const handleLike = async (userId: string) => {
-    if (currentUser) {
-      const userRef = doc(db, "users", currentUser.id);  // Reference to current user's document
-      const targetUserRef = doc(db, "users", userId);  // Reference to the target user's document
-
-      // Fetch current target user data to check likes
+    console.log("Target User ID:", userId);
+  
+    try {
+      const targetUserRef = doc(db, "users", userId); // Target user's document
       const targetUserDoc = await getDoc(targetUserRef);
-      const targetUserData = targetUserDoc.data();
-
-      if (targetUserData) {
-        // Check if the current user has already liked this profile
-        if (currentUser.likedProfiles && currentUser.likedProfiles.includes(userId)) {
-          // Remove like from current user and decrement likes for target user
-          await updateDoc(userRef, {
-            likedProfiles: arrayRemove(userId),  // Remove the target user from current user's likedProfiles array
-          });
-
-          // Decrement likes count for the target user
-          await updateDoc(targetUserRef, {
-            likes: targetUserData.likes - 1,  // Decrement likes count for the target user
-          });
-        } else {
-          // Add like to current user and increment likes for target user
-          await updateDoc(userRef, {
-            likedProfiles: arrayUnion(userId),  // Add the target user to current user's likedProfiles array
-          });
-
-          // Increment likes count for the target user
-          await updateDoc(targetUserRef, {
-            likes: (targetUserData.likes || 0) + 1,  // Increment likes count for the target user
-          });
-        }
+  
+      if (!targetUserDoc.exists()) {
+        console.error("Target user document does not exist.");
+        alert("The user you are trying to like does not exist.");
+        return;
       }
+  
+      const targetUserData = targetUserDoc.data();
+      const alreadyLiked = targetUserData.likedBy?.includes(currentUser?.id);
+  
+      if (alreadyLiked) {
+        // Unlike
+        await updateDoc(targetUserRef, {
+          likes: Math.max((targetUserData.likes || 0) - 1, 0),
+          likedBy: arrayRemove(currentUser?.id), // Remove current user ID from likedBy array
+        });
+        console.log(`User ID ${userId} unliked.`);
+      } else {
+        // Like
+        await updateDoc(targetUserRef, {
+          likes: (targetUserData.likes || 0) + 1,
+          likedBy: arrayUnion(currentUser?.id), // Add current user ID to likedBy array
+        });
+        console.log(`User ID ${userId} liked.`);
+      }
+  
+      // Update UI
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === userId
+            ? {
+                ...user,
+                likes: alreadyLiked
+                  ? Math.max((user.likes || 0) - 1, 0)
+                  : (user.likes || 0) + 1,
+                isLiked: !alreadyLiked, // Toggle isLiked state
+              }
+            : user
+        )
+      );
+    } catch (error) {
+      console.error("Error handling like:", error.message);
     }
   };
+  
+  
+  
+
 
   // Handle Book functionality
   const handleBook = async (worker: any) => {
@@ -238,10 +272,16 @@ const FindUsers = () => {
   {/* Like Button */}
   <button
     onClick={() => handleLike(user.id)}
-    className="bg-transparent text-blue-600 hover:text-blue-800 font-medium"
+    className="bg-transparent font-medium flex items-center justify-center"
   >
-    <FiThumbsUp className="inline-block mr-2" />
-    Like
+    <div
+      className={`inline-block p-2 rounded-full ${
+        user.isLiked ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-600"
+      }`}
+    >
+      <FiThumbsUp className="text-xl" />
+    </div>
+    <span className="ml-2">{user.isLiked ? "Unlike" : "Like"}</span>
   </button>
 
   {/* Book Button */}
