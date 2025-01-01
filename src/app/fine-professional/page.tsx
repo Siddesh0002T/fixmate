@@ -245,7 +245,7 @@ const handleRating = async (userId: string, newRating: number) => {
           <div className="flex justify-between text-sm text-gray-700 mb-4">
             <div className="flex items-center space-x-1">
               <span className="font-medium">Rating:</span>
-              <span>{user.rating || "Not Rated"}</span>
+              <span>{user.rating ? user.rating.toFixed(1) : "Not Rated"}</span>
             </div>
             <div className="flex items-center space-x-1">
               <span className="font-medium">Likes:</span>
@@ -283,19 +283,20 @@ const handleRating = async (userId: string, newRating: number) => {
 
           {/* Rate Button */}
 <div className="flex flex-col items-center space-y-2">
-  <select
-    onChange={(e) => handleRating(user.id, Number(e.target.value))}
-    className="p-2 bg-yellow-400 text-white rounded-md text-sm font-medium hover:bg-yellow-500"
-  >
-    <option value="" disabled selected>
-      Rate
+<select
+  defaultValue=""
+  onChange={(e) => handleRating(user.id, Number(e.target.value))}
+  className="p-2 bg-yellow-400 text-white rounded-md text-sm font-medium hover:bg-yellow-500"
+>
+  <option value="" disabled>
+    Rate
+  </option>
+  {[1, 2, 3, 4, 5].map((value) => (
+    <option key={value} value={value}>
+      {value} Star{value > 1 ? "s" : ""}
     </option>
-    {[1, 2, 3, 4, 5].map((value) => (
-      <option key={value} value={value}>
-        {value} Star{value > 1 ? "s" : ""}
-      </option>
-    ))}
-  </select>
+  ))}
+</select>
 </div>
 
           </div>
