@@ -13,7 +13,7 @@ import {
   addDoc,
 } from "firebase/firestore";
 import { FiThumbsUp } from "react-icons/fi";
-import { FaRegCalendarAlt, FaStar } from "react-icons/fa";
+import { FaRegCalendarAlt } from "react-icons/fa";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/utils/firebase";
 
@@ -38,6 +38,15 @@ const FindUsers = () => {
     });
   };
 
+  // Shuffle function to randomize users
+  const shuffleArray = (array: any[]) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  };
+
   // Fetch users from Firestore
   const fetchUsers = async () => {
     try {
@@ -54,7 +63,10 @@ const FindUsers = () => {
         };
       });
 
-      setUsers(fetchedUsers);
+      // Shuffle users before setting the state
+      const shuffledUsers = shuffleArray(fetchedUsers);
+
+      setUsers(shuffledUsers);
     } catch (error: any) {
       console.error("Error fetching users:", error.message);
     } finally {
@@ -148,47 +160,78 @@ const FindUsers = () => {
     }
   };
 
- // Handle Rating
-const handleRating = async (userId: string, newRating: number) => {
-  try {
-    const targetUserRef = doc(db, "users", userId);
-    const targetUserDoc = await getDoc(targetUserRef);
+  // Handle Rating
+  const handleRating = async (userId: string, newRating: number) => {
+    try {
+      const targetUserRef = doc(db, "users", userId);
+      const targetUserDoc = await getDoc(targetUserRef);
 
-    if (!targetUserDoc.exists()) {
-      alert("The user you are trying to rate does not exist.");
-      return;
+      if (!targetUserDoc.exists()) {
+        alert("The user you are trying to rate does not exist.");
+        return;
+      }
+
+      const targetUserData = targetUserDoc.data();
+      const totalRatings = targetUserData.totalRatings || 0;
+      const currentRating = targetUserData.rating || 0;
+
+      // Calculate new average rating
+      const updatedTotalRatings = totalRatings + 1;
+      const updatedRating =
+        (currentRating * totalRatings + newRating) / updatedTotalRatings;
+
+      // Update Firestore document
+      await updateDoc(targetUserRef, {
+        rating: updatedRating,
+        totalRatings: updatedTotalRatings,
+      });
+
+      // Update UI
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === userId
+            ? { ...user, rating: updatedRating }
+            : user
+        )
+      );
+    } catch (error: any) {
+      console.error("Error handling rating:", error.message);
     }
+  };
 
-    const targetUserData = targetUserDoc.data();
-    const totalRatings = targetUserData.totalRatings || 0;
-    const currentRating = targetUserData.rating || 0;
+  // Increment view count
+  const incrementViewCount = async (userId: string) => {
+    try {
+      const targetUserRef = doc(db, "users", userId);
+      const targetUserDoc = await getDoc(targetUserRef);
 
-    // Calculate new average rating
-    const updatedTotalRatings = totalRatings + 1;
-    const updatedRating =
-      (currentRating * totalRatings + newRating) / updatedTotalRatings;
+      if (!targetUserDoc.exists()) {
+        alert("The user you are trying to view does not exist.");
+        return;
+      }
 
-    // Update Firestore document
-    await updateDoc(targetUserRef, {
-      rating: updatedRating,
-      totalRatings: updatedTotalRatings,
-    });
+      const targetUserData = targetUserDoc.data();
+      const updatedViews = (targetUserData.views || 0) + 1;
 
-    // Update UI
-    setUsers((prevUsers) =>
-      prevUsers.map((user) =>
-        user.id === userId
-          ? { ...user, rating: updatedRating }
-          : user
-      )
-    );
-  } catch (error: any) {
-    console.error("Error handling rating:", error.message);
-  }
-};
+      // Update view count in Firestore
+      await updateDoc(targetUserRef, {
+        views: updatedViews,
+      });
+
+      // Update UI
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === userId ? { ...user, views: updatedViews } : user
+        )
+      );
+    } catch (error: any) {
+      console.error("Error incrementing view count:", error.message);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
+      <br />br
       <h1 className="text-2xl font-bold text-gray-800 mb-4">Find Workers</h1>
 
       {/* Search Bar */}
@@ -202,109 +245,108 @@ const handleRating = async (userId: string, newRating: number) => {
         />
       </div>
 
-{/* Users List */}
-{loading ? (
-  <p className="text-center text-gray-600">Loading workers...</p>
-) : (
-  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    {users
-      .filter((user) =>
-        `${user.displayName} ${user.profession} ${user.about}`
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase())
-      )
-      .map((user) => (
-        <div
-          key={user.id}
-          className="bg-white shadow rounded-lg p-4 hover:shadow-lg transition duration-300"
-        >
-          {/* Profile Section */}
-          <div className="flex items-center mb-4">
-            <img
-              src={user.photoURL || "/default-avatar.png"}
-              alt={user.displayName}
-              className="w-16 h-16 rounded-full border-2 border-gray-300"
-            />
-            <div className="ml-4">
-              <h2 className="text-lg font-bold text-gray-800">
-                {user.displayName}
-              </h2>
-              <p className="text-gray-600">{user.profession}</p>
-            </div>
-          </div>
+      {/* Users List */}
+      {loading ? (
+        <p className="text-center text-gray-600">Loading workers...</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {users
+            .filter((user) =>
+              `${user.displayName} ${user.profession} ${user.about}`
+                .toLowerCase()
+                .includes(searchTerm.toLowerCase())
+            )
+            .map((user) => (
+              <div
+                key={user.id}
+                className="bg-white shadow rounded-lg p-4 hover:shadow-lg transition duration-300"
+                onClick={() => incrementViewCount(user.id)} // Increment view count on profile click
+              >
+                {/* Profile Section */}
+                <div className="flex items-center mb-4">
+                  <img
+                    src={user.photoURL || "/default-avatar.png"}
+                    alt={user.displayName}
+                    className="w-16 h-16 rounded-full border-2 border-gray-300"
+                  />
+                  <div className="ml-4">
+                    <h2 className="text-lg font-bold text-gray-800">
+                      {user.displayName}
+                    </h2>
+                    <p className="text-gray-600">{user.profession}</p>
+                  </div>
+                </div>
 
-          {/* Additional Info */}
-          <div className="text-sm text-gray-700 mb-4">
-            <p><strong>About:</strong> {user.about}</p>
-            <p><strong>Address:</strong> {user.address}</p>
-            <p><strong>Email:</strong> {user.email}</p>
-            <p><strong>Phone:</strong> {user.phone}</p>
-          </div>
+                {/* Additional Info */}
+                <div className="text-sm text-gray-700 mb-4">
+                  <p><strong>About:</strong> {user.about}</p>
+                  <p><strong>Address:</strong> {user.address}</p>
+                  <p><strong>Email:</strong> {user.email}</p>
+                  <p><strong>Phone:</strong> {user.phone}</p>
+                </div>
 
-          {/* Ratings and Likes */}
-          <div className="flex justify-between text-sm text-gray-700 mb-4">
-            <div className="flex items-center space-x-1">
-              <span className="font-medium">Rating:</span>
-              <span>{user.rating ? user.rating.toFixed(1) : "Not Rated"}</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <span className="font-medium">Likes:</span>
-              <span>{user.likes || 0}</span>
-            </div>
-            <div className="flex items-center space-x-1">
-              <span className="font-medium">Views:</span>
-              <span>{user.views || 0}</span>
-            </div>
-          </div>
+                {/* Ratings and Likes */}
+                <div className="flex justify-between text-sm text-gray-700 mb-4">
+                  <div className="flex items-center space-x-1">
+                    <span className="font-medium">Rating:</span>
+                    <span>{user.rating ? user.rating.toFixed(1) : "Not Rated"}</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <span className="font-medium">Likes:</span>
+                    <span>{user.likes || 0}</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <span className="font-medium">Views:</span>
+                    <span>{user.views || 0}</span>
+                  </div>
+                </div>
 
-          {/* Action Buttons */}
-          <div className="flex justify-between items-center space-x-4 mt-4">
-            {/* Like Button */}
-            <button
-              onClick={() => handleLike(user.id)}
-              className={`flex items-center space-x-2 p-2 rounded-md text-sm font-medium ${
-                user.isLiked
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-600"
-              }`}
-            >
-              <FiThumbsUp />
-              <span>{user.isLiked ? "Unlike" : "Like"}</span>
-            </button>
+                {/* Action Buttons */}
+                <div className="flex justify-between items-center space-x-4 mt-4">
+                  {/* Like Button */}
+                  <button
+                    onClick={() => handleLike(user.id)}
+                    className={`flex items-center space-x-2 p-2 rounded-md text-sm font-medium ${
+                      user.isLiked
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 text-gray-600"
+                    }`}
+                  >
+                    <FiThumbsUp />
+                    <span>{user.isLiked ? "Unlike" : "Like"}</span>
+                  </button>
 
-            {/* Book Button */}
-            <button
-              onClick={() => handleBook(user)}
-              className="flex items-center space-x-2 p-2 bg-green-500 text-white rounded-md text-sm font-medium hover:bg-green-600"
-            >
-              <FaRegCalendarAlt />
-              <span>Book</span>
-            </button>
+                  {/* Book Button */}
+                  <button
+                    onClick={() => handleBook(user)}
+                    className="flex items-center space-x-2 p-2 bg-green-500 text-white rounded-md text-sm font-medium hover:bg-green-600"
+                  >
+                    <FaRegCalendarAlt />
+                    <span>Book</span>
+                  </button>
 
-          {/* Rate Button */}
-<div className="flex flex-col items-center space-y-2">
-<select
-  defaultValue=""
-  onChange={(e) => handleRating(user.id, Number(e.target.value))}
-  className="p-2 bg-yellow-400 text-white rounded-md text-sm font-medium hover:bg-yellow-500"
->
-  <option value="" disabled>
-    Rate
-  </option>
-  {[1, 2, 3, 4, 5].map((value) => (
-    <option key={value} value={value}>
-      {value} Star{value > 1 ? "s" : ""}
-    </option>
-  ))}
-</select>
-</div>
-
-          </div>
+                  {/* Rate Button */}
+                  <div className="flex flex-col items-center space-y-2">
+                    <select
+                      defaultValue=""
+                      onChange={(e) => handleRating(user.id, Number(e.target.value))}
+                      className="p-2 bg-yellow-400 text-white rounded-md text-sm font-medium hover:bg-yellow-500"
+                    >
+                      <option value="" disabled>
+                        Rate this user
+                      </option>
+                      <option value="1">1</option>
+                      <option value="2">2</option>
+                      <option value="3">3</option>
+                      <option value="4">4</option>
+                      <option value="5">5</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            ))}
         </div>
-      ))}
-  </div>
-)}
-
+      )}
     </div>
   );
 };
