@@ -168,82 +168,99 @@ const FindUsers = () => {
         />
       </div>
 
-      {/* Users List */}
-      {loading ? (
-        <p className="text-center text-gray-600">Loading workers...</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {users
-            .filter((user) =>
-              `${user.displayName} ${user.profession} ${user.about}`
-                .toLowerCase()
-                .includes(searchTerm.toLowerCase())
-            )
-            .map((user) => (
-              <div
-                key={user.id}
-                className="bg-white shadow rounded-lg p-4 hover:shadow-lg transition duration-300"
-              >
-                {/* Profile Section */}
-                <div className="flex items-center mb-4">
-                  <img
-                    src={user.photoURL || "/default-avatar.png"}
-                    alt={user.displayName}
-                    className="w-16 h-16 rounded-full border-2 border-gray-300"
-                  />
-                  <div className="ml-4">
-                    <h2 className="text-lg font-bold text-gray-800">
-                      {user.displayName}
-                    </h2>
-                    <p className="text-gray-600">{user.profession}</p>
-                  </div>
-                </div>
+{/* Users List */}
+{loading ? (
+  <p className="text-center text-gray-600">Loading workers...</p>
+) : (
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {users
+      .filter((user) =>
+        `${user.displayName} ${user.profession} ${user.about}`
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+      )
+      .map((user) => (
+        <div
+          key={user.id}
+          className="bg-white shadow rounded-lg p-4 hover:shadow-lg transition duration-300"
+        >
+          {/* Profile Section */}
+          <div className="flex items-center mb-4">
+            <img
+              src={user.photoURL || "/default-avatar.png"}
+              alt={user.displayName}
+              className="w-16 h-16 rounded-full border-2 border-gray-300"
+            />
+            <div className="ml-4">
+              <h2 className="text-lg font-bold text-gray-800">
+                {user.displayName}
+              </h2>
+              <p className="text-gray-600">{user.profession}</p>
+            </div>
+          </div>
 
-                {/* About Section */}
-                <p className="text-gray-700 text-sm mb-4">{user.about}</p>
+          {/* Additional Info */}
+          <div className="text-sm text-gray-700 mb-4">
+            <p><strong>About:</strong> {user.about}</p>
+            <p><strong>Address:</strong> {user.address}</p>
+            <p><strong>Email:</strong> {user.email}</p>
+            <p><strong>Phone:</strong> {user.phone}</p>
+          </div>
 
-                {/* Ratings and Likes */}
-                <div className="flex justify-between mb-4">
-                  <p className="text-gray-600">Likes: {user.likes || 0}</p>
-                </div>
+          {/* Ratings and Likes */}
+          <div className="flex justify-between text-sm text-gray-700 mb-4">
+            <div className="flex items-center space-x-1">
+              <span className="font-medium">Rating:</span>
+              <span>{user.rating || "Not Rated"}</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <span className="font-medium">Likes:</span>
+              <span>{user.likes || 0}</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <span className="font-medium">Views:</span>
+              <span>{user.views || 0}</span>
+            </div>
+          </div>
 
-                {/* Action Buttons */}
-                <div className="flex justify-between items-center space-x-4 mt-4">
-                  {/* Like Button */}
-                  <button
-                    onClick={() => handleLike(user.id)}
-                    className={`flex items-center space-x-2 p-2 rounded-md text-sm font-medium ${
-                      user.isLiked
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-200 text-gray-600"
-                    }`}
-                  >
-                    <FiThumbsUp />
-                    <span>{user.isLiked ? "Unlike" : "Like"}</span>
-                  </button>
+          {/* Action Buttons */}
+          <div className="flex justify-between items-center space-x-4 mt-4">
+            {/* Like Button */}
+            <button
+              onClick={() => handleLike(user.id)}
+              className={`flex items-center space-x-2 p-2 rounded-md text-sm font-medium ${
+                user.isLiked
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-gray-600"
+              }`}
+            >
+              <FiThumbsUp />
+              <span>{user.isLiked ? "Unlike" : "Like"}</span>
+            </button>
 
-                  {/* Book Button */}
-                  <button
-                    onClick={() => handleBook(user)}
-                    className="flex items-center space-x-2 p-2 bg-green-500 text-white rounded-md text-sm font-medium hover:bg-green-600"
-                  >
-                    <FaRegCalendarAlt />
-                    <span>Book</span>
-                  </button>
+            {/* Book Button */}
+            <button
+              onClick={() => handleBook(user)}
+              className="flex items-center space-x-2 p-2 bg-green-500 text-white rounded-md text-sm font-medium hover:bg-green-600"
+            >
+              <FaRegCalendarAlt />
+              <span>Book</span>
+            </button>
 
-                  {/* Rate Button */}
-                  <button
-                    onClick={() => handleRating(user.id)}
-                    className="flex items-center space-x-2 p-2 bg-yellow-400 text-white rounded-md text-sm font-medium hover:bg-yellow-500"
-                  >
-                    <FaStar />
-                    <span>Rate</span>
-                  </button>
-                </div>
-              </div>
-            ))}
+            {/* Rate Button */}
+            <button
+              onClick={() => handleRating(user.id)}
+              className="flex items-center space-x-2 p-2 bg-yellow-400 text-white rounded-md text-sm font-medium hover:bg-yellow-500"
+            >
+              <FaStar />
+              <span>Rate</span>
+            </button>
+          </div>
         </div>
-      )}
+      ))}
+  </div>
+)}
+
     </div>
   );
 };
