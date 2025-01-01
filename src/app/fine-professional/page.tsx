@@ -148,10 +148,44 @@ const FindUsers = () => {
     }
   };
 
-  // Handle Rating (Placeholder for future implementation)
-  const handleRating = (userId: string) => {
-    console.log(`Rating user with ID: ${userId}`);
-  };
+ // Handle Rating
+const handleRating = async (userId: string, newRating: number) => {
+  try {
+    const targetUserRef = doc(db, "users", userId);
+    const targetUserDoc = await getDoc(targetUserRef);
+
+    if (!targetUserDoc.exists()) {
+      alert("The user you are trying to rate does not exist.");
+      return;
+    }
+
+    const targetUserData = targetUserDoc.data();
+    const totalRatings = targetUserData.totalRatings || 0;
+    const currentRating = targetUserData.rating || 0;
+
+    // Calculate new average rating
+    const updatedTotalRatings = totalRatings + 1;
+    const updatedRating =
+      (currentRating * totalRatings + newRating) / updatedTotalRatings;
+
+    // Update Firestore document
+    await updateDoc(targetUserRef, {
+      rating: updatedRating,
+      totalRatings: updatedTotalRatings,
+    });
+
+    // Update UI
+    setUsers((prevUsers) =>
+      prevUsers.map((user) =>
+        user.id === userId
+          ? { ...user, rating: updatedRating }
+          : user
+      )
+    );
+  } catch (error: any) {
+    console.error("Error handling rating:", error.message);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -247,14 +281,23 @@ const FindUsers = () => {
               <span>Book</span>
             </button>
 
-            {/* Rate Button */}
-            <button
-              onClick={() => handleRating(user.id)}
-              className="flex items-center space-x-2 p-2 bg-yellow-400 text-white rounded-md text-sm font-medium hover:bg-yellow-500"
-            >
-              <FaStar />
-              <span>Rate</span>
-            </button>
+          {/* Rate Button */}
+<div className="flex flex-col items-center space-y-2">
+  <select
+    onChange={(e) => handleRating(user.id, Number(e.target.value))}
+    className="p-2 bg-yellow-400 text-white rounded-md text-sm font-medium hover:bg-yellow-500"
+  >
+    <option value="" disabled selected>
+      Rate
+    </option>
+    {[1, 2, 3, 4, 5].map((value) => (
+      <option key={value} value={value}>
+        {value} Star{value > 1 ? "s" : ""}
+      </option>
+    ))}
+  </select>
+</div>
+
           </div>
         </div>
       ))}
