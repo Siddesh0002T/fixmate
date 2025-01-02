@@ -1,29 +1,35 @@
 'use client'; // Indicate this is a client-side component
 
-import React, { useState, useEffect } from "react";
-import { db } from "@/utils/firebase"; // Assuming you're using Firebase
-import { doc, getDoc, updateDoc } from "firebase/firestore"; // Import Firebase methods
+import React, { useState, useEffect } from 'react';
+import { db } from '@/utils/firebase'; // Assuming you're using Firebase
+import { doc, getDoc, updateDoc } from 'firebase/firestore'; // Import Firebase methods
 
 const StatusToggle = ({ userId }) => {
-  const [status, setStatus] = useState(null); // Initially, set status to null
+  const [status, setStatus] = useState(0); // Initially, set status to 0 (offline)
   const [loading, setLoading] = useState(true); // To handle loading state
 
   // Fetch the current status from the database
   useEffect(() => {
     const fetchStatus = async () => {
+      if (!userId) {
+        console.error('No userId provided');
+        setLoading(false);
+        return;
+      }
+
       try {
-        console.log("Fetching status for userId:", userId); // Log the userId being fetched
-        const userRef = doc(db, "users", userId);
+        console.log('Fetching status for userId:', userId); // Log the userId being fetched
+        const userRef = doc(db, 'users', userId);
         const userDoc = await getDoc(userRef);
 
         if (userDoc.exists()) {
-          setStatus(userDoc.data().status); // Set the current status
+          setStatus(userDoc.data().status || 0); // Set the current status, default to 0 if missing
         } else {
-          console.error("No such user document! Check if the userId exists in Firestore.");
+          console.error('No such user document! Check if the userId exists in Firestore.');
           setStatus(0); // Set to offline if no document found
         }
       } catch (error) {
-        console.error("Error fetching status:", error);
+        console.error('Error fetching status:', error);
       } finally {
         setLoading(false); // Stop loading after fetching the data
       }
@@ -41,13 +47,13 @@ const StatusToggle = ({ userId }) => {
 
     // Update the status in the Firebase database
     try {
-      const userRef = doc(db, "users", userId);
+      const userRef = doc(db, 'users', userId);
       await updateDoc(userRef, {
         status: newStatus,
       });
-      console.log("Status updated to", newStatus === 1 ? "Online" : "Offline");
+      console.log('Status updated to', newStatus === 1 ? 'Online' : 'Offline');
     } catch (error) {
-      console.error("Error updating status:", error);
+      console.error('Error updating status:', error);
     }
   };
 
@@ -67,12 +73,12 @@ const StatusToggle = ({ userId }) => {
         />
         <span
           className={`toggle-label block overflow-hidden h-6 mb-1 rounded-full bg-gray-300 transition-all duration-200 ease-in-out ${
-            status === 1 ? "bg-green-400" : "bg-gray-400"
+            status === 1 ? 'bg-green-400' : 'bg-gray-400'
           }`}
         ></span>
       </label>
-      <span className={`text-${status === 1 ? "green" : "gray"}-600`}>
-        {status === 1 ? "Online" : "Offline"}
+      <span className={`text-${status === 1 ? 'green' : 'gray'}-600`}>
+        {status === 1 ? 'Online' : 'Offline'}
       </span>
     </div>
   );
