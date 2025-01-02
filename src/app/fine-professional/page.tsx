@@ -24,6 +24,15 @@ const FindUsers = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedWorker, setSelectedWorker] = useState<any>(null);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    problemTitle: "",
+    problemDescription: "",
+    statusBooking: 0, // Default status: Requested
+  });
 
   // Fetch current user
   const fetchCurrentUser = () => {
@@ -129,37 +138,65 @@ const FindUsers = () => {
     }
   };
 
-  // Handle Book functionality
-  const handleBook = async (worker: any) => {
+ // Handle Book functionality
+  const handleBook = (worker: any) => {
     setSelectedWorker(worker);
     setIsModalOpen(true);
 
     if (currentUser) {
-      const bookingRequest = {
-        clientId: currentUser.id,
-        clientName: currentUser.displayName,
-        workerId: worker.id,
-        workerName: worker.displayName,
-        status: "Pending",
-        createdAt: new Date(),
-      };
-
-      try {
-        const bookingRef = await addDoc(
-          collection(db, "bookingRequests"),
-          bookingRequest
-        );
-        console.log("Booking request saved with ID: ", bookingRef.id);
-
-        await updateDoc(doc(db, "users", worker.id), {
-          bookingRequests: arrayUnion(bookingRequest),
-        });
-      } catch (error: any) {
-        console.error("Error creating booking request:", error.message);
-      }
+      setFormData({
+        ...formData,
+        name: currentUser.displayName,
+        email: currentUser.email,
+        phone: currentUser.phone || "",
+        address: currentUser.address || "",
+      });
     }
   };
 
+  // Handle form field change
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  // Handle save booking request
+  const handleSaveBooking = async () => {
+    try {
+      const bookingRequest = {
+        clientId: currentUser.id,
+        clientName: currentUser.displayName,
+        workerId: selectedWorker.id,
+        workerName: selectedWorker.displayName,
+        statusBooking: formData.statusBooking,
+        createdAt: new Date(),
+        ...formData,
+      };
+
+      // Save the booking request to the 'bookingRequests' collection
+      const bookingRef = await addDoc(collection(db, "bookingRequests"), bookingRequest);
+
+      // Save the booking request to the worker's document
+      await updateDoc(doc(db, "users", selectedWorker.id), {
+        bookingRequests: arrayUnion(bookingRequest),
+      });
+
+      // Optionally, update the current user's document to store their booking requests
+      await updateDoc(doc(db, "users", currentUser.id), {
+        bookingRequests: arrayUnion(bookingRequest),
+      });
+
+      console.log("Booking request saved with ID: ", bookingRef.id);
+
+      // Close the modal
+      setIsModalOpen(false);
+    } catch (error: any) {
+      console.error("Error saving booking:", error.message);
+    }
+  };
   // Handle Rating
   const handleRating = async (userId: string, newRating: number) => {
     try {
@@ -316,15 +353,14 @@ const FindUsers = () => {
                     <span>{user.isLiked ? "Unlike" : "Like"}</span>
                   </button>
 
-                  {/* Book Button */}
-                  <button
+                   {/* Book Button */}
+                   <button
                     onClick={() => handleBook(user)}
                     className="flex items-center space-x-2 p-2 bg-green-500 text-white rounded-md text-sm font-medium hover:bg-green-600"
                   >
                     <FaRegCalendarAlt />
                     <span>Book</span>
                   </button>
-
                   {/* Rate Button */}
                   <div className="flex flex-col items-center space-y-2">
                     <select
@@ -345,6 +381,80 @@ const FindUsers = () => {
                 </div>
               </div>
             ))}
+            {/* Booking Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 className="text-xl font-bold mb-4">Booking Form</h2>
+            <div className="space-y-4">
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="Name"
+                disabled
+              />
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="Email"
+                disabled
+              />
+              <input
+                type="text"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="Phone"
+              />
+              <input
+                type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="Address"
+              />
+              <input
+                type="text"
+                name="problemTitle"
+                value={formData.problemTitle}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="Problem Title"
+              />
+              <textarea
+                name="problemDescription"
+                value={formData.problemDescription}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="Problem Description"
+              ></textarea>
+
+              <div className="flex justify-between">
+                <button
+                  onClick={handleSaveBooking}
+                  className="bg-blue-500 text-white p-2 rounded-md"
+                >
+                  Save Booking
+                </button>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="bg-gray-500 text-white p-2 rounded-md"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
         </div>
       )}
     </div>
