@@ -1,5 +1,4 @@
 "use client";
-
 import Sidebar from "@/components/Sidebar";
 import React, { useEffect, useState } from "react";
 import { auth, db } from "@/utils/firebase";
@@ -7,6 +6,8 @@ import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useRouter } from "next/navigation";
 import { FiHome, FiUser, FiSettings, FiBriefcase } from 'react-icons/fi';
+import { FiThumbsUp } from 'react-icons/fi';
+import { FaRegCalendarAlt } from 'react-icons/fa';
 
 const menuItems = [
   { label: 'Home', icon: <FiHome />, link: '/dashboard/home' },
@@ -15,7 +16,6 @@ const menuItems = [
   { label: 'Settings', icon: <FiSettings />, link: '/dashboard/settings' },
 ];
 
-// Define the profile type
 interface Profile {
   displayName: string;
   email: string;
@@ -50,7 +50,6 @@ const ProfilePage = () => {
   const [completion, setCompletion] = useState(0);
   const router = useRouter();
 
-  // Fetch user data from Firestore
   useEffect(() => {
     if (user) {
       const fetchProfile = async () => {
@@ -60,7 +59,6 @@ const ProfilePage = () => {
         if (docSnap.exists()) {
           setProfile({ ...profile, ...docSnap.data() });
         } else {
-          // If no profile, use Google account details as defaults
           setProfile({
             displayName: user.displayName || "",
             email: user.email || "",
@@ -81,14 +79,12 @@ const ProfilePage = () => {
     }
   }, [user]);
 
-  // Calculate profile completion percentage
   useEffect(() => {
     const filledFields = Object.values(profile).filter((field) => field !== "").length;
     const totalFields = Object.keys(profile).length;
     setCompletion(Math.round((filledFields / totalFields) * 100));
   }, [profile]);
 
-  // Handle form submission
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
@@ -104,7 +100,6 @@ const ProfilePage = () => {
     }
   };
 
-  // Increment like count
   const handleLike = async () => {
     try {
       const newLikes = profile.likes + 1;
@@ -115,7 +110,6 @@ const ProfilePage = () => {
     }
   };
 
-  // Increment profile views
   const incrementViewCount = async () => {
     try {
       const newViews = profile.views + 1;
@@ -126,7 +120,6 @@ const ProfilePage = () => {
     }
   };
 
-  // Handle rating submission
   const handleRating = async (newRating: number) => {
     try {
       setProfile((prevProfile: Profile) => ({ ...prevProfile, rating: newRating }));
@@ -142,6 +135,9 @@ const ProfilePage = () => {
     return null;
   }
 
+  // Disable buttons conditionally (for example, if the profile is not fully filled)
+  const isDisabled = completion < 100;
+
   return (
     <div className="flex">
       <Sidebar menuItems={menuItems} />
@@ -152,118 +148,86 @@ const ProfilePage = () => {
 
         {/* Profile Card with Like Count, Views, and Rating */}
         <div className="min-h-screen flex flex-col items-center bg-gray-100 py-12 px-6">
-          <div className="w-full max-w-2xl bg-white rounded-lg shadow p-6 space-y-6">
-            {/* Profile Picture */}
-            <div className="flex items-center space-x-4">
+          <div className="max-w-sm mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+            <div className="flex items-center p-6 bg-gradient-to-r from-blue-500 to-purple-600">
               <img
                 src={profile.photoURL || "/default-avatar.png"}
-                alt="Profile"
-                className="w-20 h-20 rounded-full object-cover"
+                alt={profile.displayName}
+                className="w-20 h-20 rounded-full border-4 border-white shadow-md"
               />
-              <div>
-                <p className="text-gray-800 font-bold">{profile.displayName}</p>
-                <button
-                  className="text-sm text-blue-500 hover:underline"
-                  onClick={() => alert("Change your profile picture via Google account.")}>
-                  Change Profile Picture
-                </button>
+              <div className="ml-6 text-white">
+                <h2 className="text-2xl font-semibold">{profile.displayName}</h2>
+                <p className="text-lg">{profile.profession}</p>
               </div>
             </div>
 
-            {/* Profile Completion */}
-            <div className="w-full bg-gray-200 rounded-full h-4">
-              <div
-                className="bg-blue-600 h-4 rounded-full"
-                style={{ width: `${completion}%` }}
-              ></div>
+            {/* Additional Info */}
+            <div className="px-6 py-4">
+              <p className="text-sm text-gray-700"><strong>About:</strong> {profile.about}</p>
+              <p className="text-sm text-gray-700"><strong>Address:</strong> {profile.address}</p>
+              <p className="text-sm text-gray-700"><strong>Email:</strong> {profile.email}</p>
+              <p className="text-sm text-gray-700"><strong>Phone:</strong> {profile.phone}</p>
             </div>
-            <p className="text-sm text-gray-600">Profile Completion: {completion}%</p>
 
-            {/* Like and View Counts */}
-            <div className="flex flex-col items-center space-y-6 mt-6">
-              <div className="flex items-center justify-center space-x-8">
-                {/* Likes Section */}
-                <div className="text-center">
-                  <p className="text-xl font-semibold text-gray-800">{profile.likes}</p>
-                  <p className="text-sm text-gray-600">Likes</p>
-                </div>
-
-                {/* Views Section */}
-                <div className="text-center">
-                  <p className="text-xl font-semibold text-gray-800">{profile.views}</p>
-                  <p className="text-sm text-gray-600">Views</p>
-                </div>
+            {/* Ratings and Likes */}
+            <div className="flex justify-between px-6 py-4 bg-gray-50 text-sm text-gray-700">
+              <div className="flex items-center space-x-1">
+                <span className="font-medium">Rating:</span>
+                <span>{profile.rating ? profile.rating.toFixed(1) : "Not Rated"}</span>
               </div>
-
-              {/* Rating Section */}
-              <div className="text-center">
-                <p className="text-xl font-semibold text-gray-800">Rating: {profile.rating}</p>
-                <div className="flex justify-center space-x-2 mt-2">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      className={`text-3xl ${profile.rating >= star ? "text-yellow-500 font-bold" : "text-gray-400"}`}
-                      onClick={() => handleRating(star)}
-                      disabled={user.uid === profile.uid} // Disable if viewing own profile
-                      style={{
-                        cursor: user.uid === profile.uid ? "not-allowed" : "pointer",
-                      }}
-                    >
-                      ★
-                    </button>
-                  ))}
-                </div>
+              <div className="flex items-center space-x-1">
+                <span className="font-medium">Likes:</span>
+                <span>{profile.likes || 0}</span>
+              </div>
+              <div className="flex items-center space-x-1">
+                <span className="font-medium">Views:</span>
+                <span>{profile.views || 0}</span>
               </div>
             </div>
 
-            {/* Profile Form */}
-            <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-lg p-6 space-y-6">
-              <div className="space-y-4">
-                <div className="flex justify-between">
-                  <h3 className="text-sm font-semibold text-gray-700">Full Name</h3>
-                  <p className="text-gray-900">{profile.displayName || "John Doe"}</p>
-                </div>
+            {/* Action Buttons */}
+            <div className="flex justify-between items-center space-x-4 p-6 bg-gray-100">
+              {/* Like Button */}
+              <button
+                onClick={handleLike}
+                className={`flex items-center space-x-2 p-2 rounded-md text-sm font-medium ${profile.isLiked ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-600"} transition duration-200`}
+                disabled={isDisabled} // Disable if profile is not fully filled
+              >
+                <FiThumbsUp />
+                <span>{profile.isLiked ? "Unlike" : "Like"}</span>
+              </button>
 
-                <div className="flex justify-between">
-                  <h3 className="text-sm font-semibold text-gray-700">Email</h3>
-                  <p className="text-gray-900">{profile.email || "example@example.com"}</p>
-                </div>
+              {/* Book Button */}
+              <button
+                onClick={() => alert("Booking feature is coming soon.")}
+                className="flex items-center space-x-2 p-2 bg-green-500 text-white rounded-md text-sm font-medium hover:bg-green-600 transition duration-200"
+                disabled={isDisabled} // Disable if profile is not fully filled
+              >
+                <FaRegCalendarAlt />
+                <span>Book</span>
+              </button>
 
-                <div className="flex justify-between">
-                  <h3 className="text-sm font-semibold text-gray-700">Age</h3>
-                  <p className="text-gray-900">{profile.age || "N/A"}</p>
-                </div>
-
-                <div className="flex justify-between">
-                  <h3 className="text-sm font-semibold text-gray-700">Phone</h3>
-                  <p className="text-gray-900">{profile.phone || "123-456-7890"}</p>
-                </div>
-
-                <div className="flex justify-between">
-                  <h3 className="text-sm font-semibold text-gray-700">Profession</h3>
-                  <p className="text-gray-900">{profile.profession || "N/A"}</p>
-                </div>
-
-                <div className="flex justify-between">
-                  <h3 className="text-sm font-semibold text-gray-700">Experience</h3>
-                  <p className="text-gray-900">{profile.experience || "N/A"}</p>
-                </div>
-
-                <div className="flex justify-between">
-                  <h3 className="text-sm font-semibold text-gray-700">Address</h3>
-                  <p className="text-gray-900">{profile.address || "N/A"}</p>
-                </div>
-
-                <div className="flex justify-between">
-                  <h3 className="text-sm font-semibold text-gray-700">About</h3>
-                  <p className="text-gray-900">{profile.about || "N/A"}</p>
-                </div>
+              {/* Rate Button */}
+              <div className="flex flex-col items-center space-y-2">
+                <select
+                  defaultValue=""
+                  onChange={(e) => handleRating(Number(e.target.value))}
+                  className="p-2 bg-yellow-400 text-white rounded-md text-sm font-medium hover:bg-yellow-500 transition duration-200"
+                  disabled={isDisabled} // Disable if profile is not fully filled
+                >
+                  <option value="" disabled>
+                    Rate this user
+                  </option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                </select>
               </div>
             </div>
           </div>
         </div>
-
-        <br /><br />
       </div>
     </div>
   );

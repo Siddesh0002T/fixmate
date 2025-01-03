@@ -300,85 +300,85 @@ const FindUsers = () => {
                 onClick={() => incrementViewCount(user.id)} // Increment view count on profile click
               >
                 {/* Profile Section */}
-                <div className="flex items-center mb-4">
-                  <img
-                    src={user.photoURL || "/default-avatar.png"}
-                    alt={user.displayName}
-                    className="w-16 h-16 rounded-full border-2 border-gray-300"
-                  />
-                  <div className="ml-4">
-                    <h2 className="text-lg font-bold text-gray-800">
-                      {user.displayName}
-                    </h2>
-                    <p className="text-gray-600">{user.profession}</p>
-                  </div>
-                </div>
+                <div className="max-w-sm mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+  <div className="flex items-center p-6 bg-gradient-to-r from-blue-500 to-purple-600">
+    <img
+      src={user.photoURL || "/default-avatar.png"}
+      alt={user.displayName}
+      className="w-20 h-20 rounded-full border-4 border-white shadow-md"
+    />
+    <div className="ml-6 text-white">
+      <h2 className="text-2xl font-semibold">{user.displayName}</h2>
+      <p className="text-lg">{user.profession}</p>
+    </div>
+  </div>
 
-                {/* Additional Info */}
-                <div className="text-sm text-gray-700 mb-4">
-                  <p><strong>About:</strong> {user.about}</p>
-                  <p><strong>Address:</strong> {user.address}</p>
-                  <p><strong>Email:</strong> {user.email}</p>
-                  <p><strong>Phone:</strong> {user.phone}</p>
-                </div>
+  {/* Additional Info */}
+  <div className="px-6 py-4">
+    <p className="text-sm text-gray-700"><strong>About:</strong> {user.about}</p>
+    <p className="text-sm text-gray-700"><strong>Address:</strong> {user.address}</p>
+    <p className="text-sm text-gray-700"><strong>Email:</strong> {user.email}</p>
+    <p className="text-sm text-gray-700"><strong>Phone:</strong> {user.phone}</p>
+  </div>
 
-                {/* Ratings and Likes */}
-                <div className="flex justify-between text-sm text-gray-700 mb-4">
-                  <div className="flex items-center space-x-1">
-                    <span className="font-medium">Rating:</span>
-                    <span>{user.rating ? user.rating.toFixed(1) : "Not Rated"}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <span className="font-medium">Likes:</span>
-                    <span>{user.likes || 0}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <span className="font-medium">Views:</span>
-                    <span>{user.views || 0}</span>
-                  </div>
-                </div>
+  {/* Ratings and Likes */}
+  <div className="flex justify-between px-6 py-4 bg-gray-50 text-sm text-gray-700">
+    <div className="flex items-center space-x-1">
+      <span className="font-medium">Rating:</span>
+      <span>{user.rating ? user.rating.toFixed(1) : "Not Rated"}</span>
+    </div>
+    <div className="flex items-center space-x-1">
+      <span className="font-medium">Likes:</span>
+      <span>{user.likes || 0}</span>
+    </div>
+    <div className="flex items-center space-x-1">
+      <span className="font-medium">Views:</span>
+      <span>{user.views || 0}</span>
+    </div>
+  </div>
 
-                {/* Action Buttons */}
-                <div className="flex justify-between items-center space-x-4 mt-4">
-                  {/* Like Button */}
-                  <button
-                    onClick={() => handleLike(user.id)}
-                    className={`flex items-center space-x-2 p-2 rounded-md text-sm font-medium ${
-                      user.isLiked
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-200 text-gray-600"
-                    }`}
-                  >
-                    <FiThumbsUp />
-                    <span>{user.isLiked ? "Unlike" : "Like"}</span>
-                  </button>
+  {/* Action Buttons */}
+  <div className="flex justify-between items-center space-x-4 p-6 bg-gray-100">
+    {/* Like Button */}
+    <button
+      onClick={() => handleLike(user.id)}
+      className={`flex items-center space-x-2 p-2 rounded-md text-sm font-medium ${
+        user.isLiked ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-600"
+      } transition duration-200`}
+    >
+      <FiThumbsUp />
+      <span>{user.isLiked ? "Unlike" : "Like"}</span>
+    </button>
 
-                   {/* Book Button */}
-                   <button
-                    onClick={() => handleBook(user)}
-                    className="flex items-center space-x-2 p-2 bg-green-500 text-white rounded-md text-sm font-medium hover:bg-green-600"
-                  >
-                    <FaRegCalendarAlt />
-                    <span>Book</span>
-                  </button>
-                  {/* Rate Button */}
-                  <div className="flex flex-col items-center space-y-2">
-                    <select
-                      defaultValue=""
-                      onChange={(e) => handleRating(user.id, Number(e.target.value))}
-                      className="p-2 bg-yellow-400 text-white rounded-md text-sm font-medium hover:bg-yellow-500"
-                    >
-                      <option value="" disabled>
-                        Rate this user
-                      </option>
-                      <option value="1">1</option>
-                      <option value="2">2</option>
-                      <option value="3">3</option>
-                      <option value="4">4</option>
-                      <option value="5">5</option>
-                    </select>
-                  </div>
-                </div>
+    {/* Book Button */}
+    <button
+      onClick={() => handleBook(user)}
+      className="flex items-center space-x-2 p-2 bg-green-500 text-white rounded-md text-sm font-medium hover:bg-green-600 transition duration-200"
+    >
+      <FaRegCalendarAlt />
+      <span>Book</span>
+    </button>
+
+    {/* Rate Button */}
+    <div className="flex flex-col items-center space-y-2">
+      <select
+        defaultValue=""
+        onChange={(e) => handleRating(user.id, Number(e.target.value))}
+        className="p-2 bg-yellow-400 text-white rounded-md text-sm font-medium hover:bg-yellow-500 transition duration-200"
+      >
+        <option value="" disabled>
+          Rate this user
+        </option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+      </select>
+    </div>
+  </div>
+</div>
+
               </div>
             ))}
             {/* Booking Modal */}
