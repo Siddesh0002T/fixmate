@@ -78,13 +78,17 @@ const ProfilePage = () => {
   // Handle form submission
   const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try {
-      // Add the status to the profile data
-      await setDoc(doc(db, "users", user.uid), { ...profile, status });
-      alert("Profile updated successfully!");
-    } catch (error) {
-      console.error("Error updating profile: ", error);
-      alert("Failed to save changes.");
+    if (user) { // Ensure that user is not null or undefined
+      try {
+        // Add the status to the profile data
+        await setDoc(doc(db, "users", user.uid), { ...profile, status });
+        alert("Profile updated successfully!");
+      } catch (error) {
+        console.error("Error updating profile: ", error);
+        alert("Failed to save changes.");
+      }
+    } else {
+      alert("User is not authenticated.");
     }
   };
 
@@ -113,8 +117,7 @@ const ProfilePage = () => {
                 <p className="text-gray-800 font-bold">{profile.displayName}</p>
                 <button
                   className="text-sm text-blue-500 hover:underline"
-                  onClick={() => alert("Change your profile picture via Google account.")}
-                >
+                  onClick={() => alert("Change your profile picture via Google account.")}>
                   Change Profile Picture
                 </button>
               </div>

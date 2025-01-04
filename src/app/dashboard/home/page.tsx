@@ -29,6 +29,7 @@ interface Profile {
   likes: number;
   views: number;
   rating: number;
+  isLiked: boolean;
 }
 
 const ProfilePage = () => {
@@ -46,7 +47,9 @@ const ProfilePage = () => {
     likes: 0,
     views: 0,
     rating: 0,
+    isLiked: false,
   });
+  
   const [completion, setCompletion] = useState(0);
   const router = useRouter();
 
@@ -57,7 +60,10 @@ const ProfilePage = () => {
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
-          setProfile({ ...profile, ...docSnap.data() });
+          setProfile((prevProfile) => ({
+            ...prevProfile,
+            ...docSnap.data(),
+          }));
         } else {
           setProfile({
             displayName: user.displayName || "",
@@ -72,6 +78,7 @@ const ProfilePage = () => {
             likes: 0,
             views: 0,
             rating: 0,
+            isLiked: false,
           });
         }
       };
@@ -102,28 +109,44 @@ const ProfilePage = () => {
 
   const handleLike = async () => {
     try {
-      const newLikes = profile.likes + 1;
-      setProfile((prevProfile: Profile) => ({ ...prevProfile, likes: newLikes }));
-      await updateDoc(doc(db, "users", user.uid), { likes: newLikes });
+      if (user) {
+        const newLikes = profile.isLiked ? profile.likes - 1 : profile.likes + 1;
+        setProfile((prevProfile: Profile) => ({
+          ...prevProfile,
+          likes: newLikes,
+          isLiked: !prevProfile.isLiked,
+        }));
+        await updateDoc(doc(db, "users", user.uid), { likes: newLikes });
+      } else {
+        console.error("User is not logged in.");
+      }
     } catch (error) {
       console.error("Error updating like count: ", error);
     }
   };
-
+  
   const incrementViewCount = async () => {
     try {
-      const newViews = profile.views + 1;
-      setProfile((prevProfile: Profile) => ({ ...prevProfile, views: newViews }));
-      await updateDoc(doc(db, "users", user.uid), { views: newViews });
+      if (user) {
+        const newViews = profile.views + 1;
+        setProfile((prevProfile: Profile) => ({ ...prevProfile, views: newViews }));
+        await updateDoc(doc(db, "users", user.uid), { views: newViews });
+      } else {
+        console.error("User is not logged in.");
+      }
     } catch (error) {
       console.error("Error updating view count: ", error);
     }
   };
-
+  
   const handleRating = async (newRating: number) => {
     try {
-      setProfile((prevProfile: Profile) => ({ ...prevProfile, rating: newRating }));
-      await updateDoc(doc(db, "users", user.uid), { rating: newRating });
+      if (user) {
+        setProfile((prevProfile: Profile) => ({ ...prevProfile, rating: newRating }));
+        await updateDoc(doc(db, "users", user.uid), { rating: newRating });
+      } else {
+        console.error("User is not logged in.");
+      }
     } catch (error) {
       console.error("Error updating rating: ", error);
     }
@@ -135,7 +158,6 @@ const ProfilePage = () => {
     return null;
   }
 
-  // Disable buttons conditionally (for example, if the profile is not fully filled)
   const isDisabled = completion < 100;
 
   return (
@@ -146,7 +168,6 @@ const ProfilePage = () => {
         
         <h1 className="text-2xl font-semibold">Profile</h1>
 
-        {/* Profile Card with Like Count, Views, and Rating */}
         <div className="min-h-screen flex flex-col items-center bg-gray-100 py-12 px-6">
           <div className="max-w-sm mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
             <div className="flex items-center p-6 bg-gradient-to-r from-blue-500 to-purple-600">
@@ -161,7 +182,6 @@ const ProfilePage = () => {
               </div>
             </div>
 
-            {/* Additional Info */}
             <div className="px-6 py-4">
               <p className="text-sm text-gray-700"><strong>About:</strong> {profile.about}</p>
               <p className="text-sm text-gray-700"><strong>Address:</strong> {profile.address}</p>
@@ -169,7 +189,6 @@ const ProfilePage = () => {
               <p className="text-sm text-gray-700"><strong>Phone:</strong> {profile.phone}</p>
             </div>
 
-            {/* Ratings and Likes */}
             <div className="flex justify-between px-6 py-4 bg-gray-50 text-sm text-gray-700">
               <div className="flex items-center space-x-1">
                 <span className="font-medium">Rating:</span>
@@ -185,45 +204,25 @@ const ProfilePage = () => {
               </div>
             </div>
 
-            {/* Action Buttons */}
             <div className="flex justify-between items-center space-x-4 p-6 bg-gray-100">
-              {/* Like Button */}
               <button
                 onClick={handleLike}
-                className={`flex items-center space-x-2 p-2 rounded-md text-sm font-medium ${profile.isLiked ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-600"} transition duration-200`}
-                disabled={isDisabled} // Disable if profile is not fully filled
+                className={`flex items-center space-x-2 p-2 rounded-md text-sm font-medium ${profile.isLiked ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-800"}`}
               >
                 <FiThumbsUp />
-                <span>{profile.isLiked ? "Unlike" : "Like"}</span>
+                <span>{profile.isLiked ? "Liked" : "Like"}</span>
               </button>
 
-              {/* Book Button */}
-              <button
-                onClick={() => alert("Booking feature is coming soon.")}
-                className="flex items-center space-x-2 p-2 bg-green-500 text-white rounded-md text-sm font-medium hover:bg-green-600 transition duration-200"
-                disabled={isDisabled} // Disable if profile is not fully filled
-              >
-                <FaRegCalendarAlt />
-                <span>Book</span>
-              </button>
-
-              {/* Rate Button */}
-              <div className="flex flex-col items-center space-y-2">
-                <select
-                  defaultValue=""
-                  onChange={(e) => handleRating(Number(e.target.value))}
-                  className="p-2 bg-yellow-400 text-white rounded-md text-sm font-medium hover:bg-yellow-500 transition duration-200"
-                  disabled={isDisabled} // Disable if profile is not fully filled
-                >
-                  <option value="" disabled>
-                    Rate this user
-                  </option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                </select>
+              <div className="flex space-x-2">
+                {[1, 2, 3, 4, 5].map((ratingValue) => (
+                  <button
+                    key={ratingValue}
+                    onClick={() => handleRating(ratingValue)}
+                    className={`p-2 rounded-md text-sm ${profile.rating >= ratingValue ? "bg-yellow-500" : "bg-gray-200"}`}
+                  >
+                    {ratingValue}
+                  </button>
+                ))}
               </div>
             </div>
           </div>

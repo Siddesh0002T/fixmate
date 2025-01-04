@@ -1,6 +1,5 @@
 import Sidebar from '@/components/Sidebar';
 import { FiHome, FiUser, FiSettings, FiBriefcase } from 'react-icons/fi';
-import StatusToggle from '@/components/StatusToggle'; // Import StatusToggle component
 
 const menuItems = [
   { label: 'Home', icon: <FiHome />, link: '/dashboard/home' },
@@ -25,7 +24,7 @@ const SettingsPage = () => {
         {/* Status Toggle Section */}
         <div className="space-y-4">
           <h2 className="text-lg font-semibold">User Status</h2>
-          <StatusToggle userId={userId} currentStatus={currentStatus} />
+         
         </div>
         
         {/* Your other settings content here */}

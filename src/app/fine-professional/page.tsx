@@ -19,6 +19,7 @@ import { auth } from "@/utils/firebase";
 
 const FindUsers = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [addressSearchTerm, setAddressSearchTerm] = useState<string>(""); // New state for address search
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -281,6 +282,16 @@ const FindUsers = () => {
           className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
+       {/* Address Search Bar */}
+       <div className="mb-6">
+        <input
+          type="text"
+          value={addressSearchTerm}
+          onChange={(e) => setAddressSearchTerm(e.target.value)}
+          placeholder="Search workers by address..."
+          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
 
       {/* Users List */}
       {loading ? (
@@ -288,11 +299,12 @@ const FindUsers = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {users
-            .filter((user) =>
-              `${user.displayName} ${user.profession} ${user.about}`
-                .toLowerCase()
-                .includes(searchTerm.toLowerCase())
-            )
+              .filter((user) =>
+                `${user.displayName} ${user.profession} ${user.about}`
+                  .toLowerCase()
+                  .includes(searchTerm.toLowerCase()) &&
+                user.address.toLowerCase().includes(addressSearchTerm.toLowerCase())
+              )
             .map((user) => (
               <div
                 key={user.id}

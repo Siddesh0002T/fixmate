@@ -59,17 +59,22 @@ export default function Bookings() {
   const handleStatusChange = async (bookingId: string, currentStatus: number) => {
     const newStatus = currentStatus === 0 ? 1 : currentStatus === 1 ? 2 : 0; // Toggle between 0, 1, 2
     const bookingRef = doc(db, "bookingRequests", bookingId);
-
+  
     try {
       await updateDoc(bookingRef, {
         statusBooking: newStatus,
       });
       fetchBookings(); // Refetch bookings after updating status
-    } catch (error) {
-      console.error("Error updating status:", error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Error updating status:", error.message);
+      } else {
+        console.error("An unknown error occurred while updating status.");
+      }
     }
   };
-
+  
+  
   useEffect(() => {
     fetchCurrentUser();
   }, []);
