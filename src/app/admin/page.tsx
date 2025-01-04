@@ -38,6 +38,7 @@ export default function AdminLogin() {
 
       if (!querySnapshot.empty) {
         // Successful login
+        localStorage.setItem("isAdminLoggedIn", "true"); // Save login state
         router.push("/admin/dashboard");
       } else {
         setError("Invalid username or password.");
