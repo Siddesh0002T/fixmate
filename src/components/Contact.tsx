@@ -116,7 +116,7 @@ export default function Contact() {
                 <textarea
                   id="message"
                   name="message"
-                  rows="5"
+                  rows={5}
                   className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   placeholder="Your message here..."
                   value={formData.message}

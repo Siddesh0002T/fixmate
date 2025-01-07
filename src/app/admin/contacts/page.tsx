@@ -4,8 +4,17 @@ import React, { useEffect, useState } from "react";
 import { db } from "@/utils/firebase";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 
+// Define the message type
+type Message = {
+  id: string;
+  name: string;
+  email: string;
+  message: string;
+  timestamp: { seconds: number; nanoseconds: number };
+};
+
 export default function Contacts() {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<Message[]>([]); // Explicitly define the type
   const [loading, setLoading] = useState(true);
 
   // Fetch messages from Firestore
@@ -19,7 +28,7 @@ export default function Contacts() {
         const messagesList = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
-        }));
+        })) as Message[]; // Type assertion
 
         setMessages(messagesList);
       } catch (err) {
@@ -34,7 +43,9 @@ export default function Contacts() {
 
   return (
     <section className="p-8">
-        <br /><br /><br />
+      <br />
+      <br />
+      <br />
       <h1 className="text-3xl font-bold mb-6">Contact Messages</h1>
       {loading ? (
         <p>Loading messages...</p>
@@ -50,7 +61,11 @@ export default function Contacts() {
               <p className="text-gray-800 mb-4">{message.message}</p>
               <div className="text-sm text-gray-500">
                 <p>Sent on:</p>
-                <p>{new Date(message.timestamp.seconds * 1000).toLocaleString()}</p>
+                <p>
+                  {new Date(
+                    message.timestamp.seconds * 1000
+                  ).toLocaleString()}
+                </p>
               </div>
             </div>
           ))}

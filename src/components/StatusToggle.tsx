@@ -4,7 +4,12 @@ import React, { useState, useEffect } from 'react';
 import { db } from '@/utils/firebase'; // Assuming you're using Firebase
 import { doc, getDoc, updateDoc } from 'firebase/firestore'; // Import Firebase methods
 
-const StatusToggle = ({ userId }) => {
+// Define the type for the props
+interface StatusToggleProps {
+  userId: string; // userId is a string
+}
+
+const StatusToggle: React.FC<StatusToggleProps> = ({ userId }) => {
   const [status, setStatus] = useState(0); // Initially, set status to 0 (offline)
   const [loading, setLoading] = useState(true); // To handle loading state
 

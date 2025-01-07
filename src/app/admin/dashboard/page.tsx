@@ -20,7 +20,7 @@ export default function AdminDashboard() {
       <div className="space-y-4">
         <button
           onClick={() => router.push("/admin/contacts")}
-          className="block w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-lg shadow-lg hover:bg-gradient-to-l from-pink-500 to-purple-500 hover:shadow-xl transition duration-300 text-black-500"
+          className="block w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-lg shadow-lg hover:bg-gradient-to-l from-pink-500 to-purple-500 hover:shadow-xl transition duration-300"
         >
           View Contact Messages
         </button>

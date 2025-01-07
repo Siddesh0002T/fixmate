@@ -172,9 +172,9 @@ const FindUsers = () => {
         clientName: currentUser.displayName,
         workerId: selectedWorker.id,
         workerName: selectedWorker.displayName,
-        statusBooking: formData.statusBooking,
         createdAt: new Date(),
         ...formData,
+        statusBooking: formData.statusBooking,
       };
 
       // Save the booking request to the 'bookingRequests' collection
