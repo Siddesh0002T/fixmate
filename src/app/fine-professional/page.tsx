@@ -303,7 +303,7 @@ const FindUsers = () => {
                 `${user.displayName} ${user.profession} ${user.about}`
                   .toLowerCase()
                   .includes(searchTerm.toLowerCase()) &&
-                user.address.toLowerCase().includes(addressSearchTerm.toLowerCase())
+                (user.address || "").toLowerCase().includes(addressSearchTerm.toLowerCase())
               )
             .map((user) => (
               <div
